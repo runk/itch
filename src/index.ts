@@ -70,7 +70,7 @@ Price 32 4 Price (4) */
 // const b = Buffer.from('0a4142494f20202020534e000000644e435a20504e4e324e000000004e002752001e0000', 'hex')
 // console.log(b)
 
-const stream = fs.createReadStream(source, { start: 0, end: 2 * 100000 });
+const stream = fs.createReadStream(source, { start: 0, end: 4 * 100000 });
 let leftover: Buffer;
 let seq = 0;
 stream.on("data", (chunk: Buffer) => {
@@ -100,6 +100,6 @@ stream.on("data", (chunk: Buffer) => {
 	} while (offset < buf.length);
 });
 
-// stream.on("end", (chunk) => {
-// 	console.log("> end", chunk);
-// });
+stream.on("end", (chunk) => {
+	console.log("> end", chunk);
+});
