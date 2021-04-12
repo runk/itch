@@ -1,68 +1,100 @@
 // const path = require('path');
-const fs = require("fs");
+import fs from 'fs';
+import * as decoders from './decoders'
+import { Message, MessageType } from './types';
 
 // https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/NQTVITCHSpecification.pdf
 const source = "/Users/dshirokov/Downloads/01302020.NASDAQ_ITCH50";
 
-// const readInt = (offset: number, length: number, buf: Buffer) => {
-// 	let val = BigInt(0);
-// 	const eight = BigInt(8);
-// 	for (let i = 0; i < length; i++) {
-// 		val = (val << eight) + BigInt(buf[offset + i]);
-// 	}
-// 	return val
-// }
 
-// Order book: (type A, P, D, R, E, C)
-const parse = (type: string, buf: Buffer) => {
-	if (type == 'A') {
+const parse = (type: string, buf: Buffer): Message | null => {
+	if (type == MessageType.AddOrder || type == MessageType.AddOrderWithAttribution) {
 		return {
-			type,
-			locate: buf.readUInt16BE(1),
-			tracking: buf.readUInt16BE(3),
-			timestamp: parseInt(buf.toString('hex', 5, 11), 16),
-			ref: buf.toString('hex', 11, 19),
-			side: buf.toString('latin1', 19, 20),
-			shares: buf.readUInt32BE(20),
-			stock: buf.toString('latin1', 24, 32),
-			price: buf.readUInt32BE(32),
+			header: decoders.header(type, buf),
+			body: {
+				ref: buf.toString('hex', 11, 19),
+				side: buf.toString('latin1', 19, 20),
+				shares: buf.readUInt32BE(20),
+				stock: buf.toString('latin1', 24, 32),
+				price: buf.readUInt32BE(32),
+			}
 		}
 	}
 
-	if (type === 'P') {
+	if (type === MessageType.System) {
 		return {
-			type,
-			locate: buf.readUInt16BE(1),
-			tracking: buf.readUInt16BE(3),
-			timestamp: parseInt(buf.toString('hex', 5, 11), 16),
-			ref: buf.toString('hex', 11, 19),
-			side: 'B',
-			shares: buf.readUInt32BE(20),
-			stock: buf.toString('latin1', 24, 32),
-			price: buf.readUInt32BE(32),
-		}
-	}
-
-	if (type === "S") {
-		return {
-			type,
-			locate: buf.readUInt16BE(1),
-			tracking: buf.readUInt16BE(3),
-			timestamp: parseInt(buf.toString('hex', 5, 11), 16),
-			eventCode: buf.toString('latin1', 11, 12)
+			header: decoders.header(type, buf),
+			body: {
+				eventCode: buf.toString('latin1', 11, 12)
+			}
 		};
 	}
 
-	if (type === "R") {
+	if (type === MessageType.StockDirectory) {
 		return {
-			type,
-			locate: buf.readUInt16BE(1),
-			tracking: buf.readUInt16BE(3),
-			timestamp: parseInt(buf.toString('hex', 5, 11), 16),
-			stock: buf.toString('latin1', 11, 19),
+			header: decoders.header(type, buf),
+			body: {
+				stock: buf.toString('latin1', 11, 19),
+			}
 		}
 	}
 
+	if (type === MessageType.OrderExecuted) {
+		return {
+			header: decoders.header(type, buf),
+			body: {
+				reference: buf.toString('hex', 11, 19),
+				shares: buf.readUInt32BE(19),
+				match: buf.toString('hex', 23, 31),
+			}
+		}
+	}
+
+	if (type === MessageType.OrderExecutedWithPrice) {
+		return {
+			header: decoders.header(type, buf),
+			body: {
+				reference: buf.toString('hex', 11, 19),
+				shares: buf.readUInt32BE(19),
+				match: buf.toString('hex', 23, 31),
+				printable: buf[31],
+				price: buf.readUInt32BE(32),
+			}
+		}
+	}
+
+	if (type === MessageType.OrderCancel) {
+		return {
+			header: decoders.header(type, buf),
+			body: {
+				reference: buf.toString('hex', 11, 19),
+				shares: buf.readUInt32BE(19)
+			}
+		}
+	}
+
+	if (type === MessageType.OrderDelete) {
+		return {
+			header: decoders.header(type, buf),
+			body: {
+				reference: buf.toString('hex', 11, 19),
+			}
+		}
+	}
+
+	if (type === MessageType.OrderReplace) {
+		return {
+			header: decoders.header(type, buf),
+			body: {
+				reference: buf.toString('hex', 11, 19),
+				referenceNew: buf.toString('hex', 19, 27),
+				shares: buf.readUInt32BE(27),
+				price: buf.readUInt32BE(31),
+			}
+		}
+	}
+
+	return null;
 };
 
 // const b = Buffer.from('0a4142494f20202020534e000000644e435a20504e4e324e000000004e002752001e0000', 'hex')
