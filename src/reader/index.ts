@@ -1,9 +1,7 @@
 import fs from 'fs';
-import parse from '../parser';
-import { Message } from '../types';
+import { MessageType } from '../types';
 
-
-type OnMessageFn = (msg: Message) => void;
+type OnMessageFn = (type: MessageType, msg: Buffer) => void;
 
 export default (source: string, onMessage: OnMessageFn) => {
   // const stream = fs.createReadStream(source, { start: 0, end: 10 * 7000000 });
@@ -38,20 +36,18 @@ export default (source: string, onMessage: OnMessageFn) => {
       // TODO: do not copy
       const message = buf.slice(offset + 2, offset + 3 + size - 1)
 
-      const msg = parse(type, message)
-      if (msg !== null) {
-        onMessage(msg);
-      }
+      // const msg = parse(type, message)
+      onMessage(type as MessageType, message);
 
       if (seq % 1e6 == 0) console.log('> seq', seq)
 
       offset = offset + 2 + size;
     } while (offset < buf.length);
 
-    if (seq > 20 * 1e6) {
-      console.log("Hard stop")
-      process.kill(1)
-    }
+    // if (seq > 20 * 1e6) {
+    //   console.log("Hard stop")
+    //   process.kill(1)
+    // }
   });
 
   stream.on("end", () => {

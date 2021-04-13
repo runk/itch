@@ -1,12 +1,13 @@
 import { assert } from "console";
 
-type Order = {
+export type Order = {
+  id: number;
   stock: string
   locate: number
   price: number
   shares: number
   reference: string
-  side: 0 | 1
+  side: string
 }
 
 type Locates = Map<number, string>;
@@ -21,6 +22,10 @@ export default class Pool {
   }
 
   stockRegister(locate: number, stock: string) {
+    // if (stock.startsWith('AAPL')) {
+    //   console.log(locate)
+    //   process.exit(1)
+    // }
     this.locates.set(locate, stock);
   }
 
@@ -28,8 +33,9 @@ export default class Pool {
     return this.locates.get(locate);
   }
 
-  add(stock: string, locate: number, price: number, shares: number, reference: string, side: 0 | 1) {
+  add(stock: string, locate: number, price: number, shares: number, reference: string, side: string) {
     this.store.set(reference, {
+      id: Math.random(),
       stock,
       locate,
       price,
@@ -38,10 +44,18 @@ export default class Pool {
       reference,
       side,
     });
+    // if (this.store.size >= 25000) {
+    //   this.store.forEach((order, ref) => {
+    //     console.log(ref, order)
+    //   })
+    // }
+    if (this.store.size % 1e3 == 0)
+      console.log('>>>', this.store.size)
   }
 
   delete(reference: string) {
-    this.store.delete(reference)
+    const ok = this.store.delete(reference)
+    assert(ok)
   }
 
   modify(reference: string, executedShares: number) {

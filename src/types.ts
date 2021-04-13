@@ -25,9 +25,14 @@ export type MessageHeader = {
   timestamp: number,
 }
 
-export type MessageBody = Record<string, string | number>;
+// export interface MessageBody =
+//   reference?: string;
+//   price?: number;
+//   shares?: number;
+//   [key: string]: string | number;
+// }
 
-export interface Message {
+export interface Message<T = unknown> {
   header: MessageHeader,
-  body: MessageBody
+  body: T
 }
