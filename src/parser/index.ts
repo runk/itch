@@ -1,5 +1,7 @@
 import { Message, MessageHeader, MessageType } from "../types";
 
+export const getLocate = (buf: Buffer) => buf.readUInt16BE(1);
+
 const parseHeader = (type: MessageType, buf: Buffer): MessageHeader => ({
 	type,
 	locate: buf.readUInt16BE(1),
@@ -112,13 +114,13 @@ export class MessageOrderReplace extends Base {
 		super(buf);
 		this.reference = buf.toString('hex', 11, 19)
 		this.referenceNew = buf.toString('hex', 19, 27),
-		this.shares = buf.readUInt32BE(27)
+			this.shares = buf.readUInt32BE(27)
 		this.price = buf.readUInt32BE(31)
 	}
 }
 
 
-export default (type: string, buf: Buffer): Message | null => {
+// export default (type: string, buf: Buffer): Message | null => {
 	// if (type == MessageType.AddOrder || type == MessageType.AddOrderWithAttribution) {
 	// 	return {
 	// 		header: parseHeader(type, buf),
@@ -206,5 +208,5 @@ export default (type: string, buf: Buffer): Message | null => {
 	// }
 
 
-	return null;
-};
+// 	return null;
+// };

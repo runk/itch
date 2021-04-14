@@ -1,5 +1,5 @@
 import Pool, { Order } from ".";
-import { MessageAddOrder, MessageOrderCancel, MessageOrderDelete, MessageOrderExecuted, MessageOrderExecutedWithPrice, MessageOrderReplace, MessageStockDirectory } from "../parser";
+import { getLocate, MessageAddOrder, MessageOrderCancel, MessageOrderDelete, MessageOrderExecuted, MessageOrderExecutedWithPrice, MessageOrderReplace, MessageStockDirectory } from "../parser";
 import { MessageType } from "../types";
 
 export default (pool: Pool) => {
@@ -8,26 +8,26 @@ export default (pool: Pool) => {
     switch (type) {
       case MessageType.AddOrder:
       case MessageType.AddOrderWithAttribution:
+        if (getLocate(buf) != 13) break;
         msg = new MessageAddOrder(buf)
-        if (msg.locate != 13) break;
         pool.add(msg.stock, msg.locate, msg.price, msg.shares, msg.reference, msg.side);
         break;
 
       case MessageType.OrderDelete:
+        if (getLocate(buf) != 13) break;
         msg = new MessageOrderDelete(buf);
-        if (msg.locate != 13) break;
         pool.delete(msg.reference)
         break;
 
       case MessageType.OrderCancel:
+        if (getLocate(buf) != 13) break;
         msg = new MessageOrderCancel(buf);
-        if (msg.locate != 13) break;
         pool.modify(msg.reference, msg.shares)
         break;
 
       case MessageType.OrderReplace:
+        if (getLocate(buf) != 13) break;
         msg = new MessageOrderReplace(buf);
-        if (msg.locate != 13) break;
         order = pool.get(msg.reference)
         if (!order) {
           throw new Error('Order not found')
@@ -38,21 +38,24 @@ export default (pool: Pool) => {
         break
 
       case MessageType.OrderExecutedWithPrice:
+        if (getLocate(buf) != 13) break;
         msg = new MessageOrderExecutedWithPrice(buf);
-        if (msg.locate != 13) break;
+
+        console.log(msg)
         pool.modify(msg.reference, msg.shares)
         break
 
       case MessageType.OrderExecuted:
+        if (getLocate(buf) != 13) break;
         msg = new MessageOrderExecuted(buf);
-        if (msg.locate != 13) break;
 
+        console.log(msg)
         pool.modify(msg.reference, msg.shares)
         break;
 
       case MessageType.StockDirectory:
+        if (getLocate(buf) != 13) break;
         msg = new MessageStockDirectory(buf);
-        if (msg.locate != 13) break;
 
         pool.stockRegister(msg.locate, msg.stock)
         break;
