@@ -1,4 +1,5 @@
 import { Message, MessageHeader, MessageType } from "../types";
+import { timestampToTime } from "../utils";
 
 export const getLocate = (buf: Buffer) => buf.readUInt16BE(1);
 
@@ -18,6 +19,10 @@ class Base {
 		this.locate = buf.readUInt16BE(1)
 		this.tracking = buf.readUInt16BE(3);
 		this.timestamp = parseInt(buf.toString('hex', 5, 11), 16)
+	}
+
+	toString() {
+		return `${timestampToTime(this.timestamp)}  ${this.constructor.name} ${this.locate}`
 	}
 }
 
@@ -65,6 +70,10 @@ export class MessageOrderExecuted extends Base {
 		this.shares = buf.readUInt32BE(19)
 		this.match = buf.toString('hex', 23, 31)
 	}
+
+	toString() {
+		return `${super.toString()} ${this.shares}`
+	}
 }
 
 export class MessageOrderExecutedWithPrice extends Base {
@@ -81,6 +90,10 @@ export class MessageOrderExecutedWithPrice extends Base {
 		this.match = buf.toString('hex', 23, 31)
 		this.printable = buf[31]
 		this.price = buf.readUInt32BE(32)
+	}
+
+	toString() {
+		return `${super.toString()} ${this.shares} ${this.price}`
 	}
 }
 

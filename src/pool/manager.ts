@@ -4,29 +4,27 @@ import { MessageType } from "../types";
 
 export default (pool: Pool) => {
   const onMessage = (type: MessageType, buf: Buffer) => {
+    if (getLocate(buf) != 13) return;
+
     let msg, order;
     switch (type) {
       case MessageType.AddOrder:
       case MessageType.AddOrderWithAttribution:
-        if (getLocate(buf) != 13) break;
         msg = new MessageAddOrder(buf)
         pool.add(msg.stock, msg.locate, msg.price, msg.shares, msg.reference, msg.side);
         break;
 
       case MessageType.OrderDelete:
-        if (getLocate(buf) != 13) break;
         msg = new MessageOrderDelete(buf);
         pool.delete(msg.reference)
         break;
 
       case MessageType.OrderCancel:
-        if (getLocate(buf) != 13) break;
         msg = new MessageOrderCancel(buf);
         pool.modify(msg.reference, msg.shares)
         break;
 
       case MessageType.OrderReplace:
-        if (getLocate(buf) != 13) break;
         msg = new MessageOrderReplace(buf);
         order = pool.get(msg.reference)
         if (!order) {
@@ -38,23 +36,20 @@ export default (pool: Pool) => {
         break
 
       case MessageType.OrderExecutedWithPrice:
-        if (getLocate(buf) != 13) break;
         msg = new MessageOrderExecutedWithPrice(buf);
 
-        console.log(msg)
+        console.log(msg.toString())
         pool.modify(msg.reference, msg.shares)
         break
 
       case MessageType.OrderExecuted:
-        if (getLocate(buf) != 13) break;
         msg = new MessageOrderExecuted(buf);
 
-        console.log(msg)
+        console.log(msg.toString())
         pool.modify(msg.reference, msg.shares)
         break;
 
       case MessageType.StockDirectory:
-        if (getLocate(buf) != 13) break;
         msg = new MessageStockDirectory(buf);
 
         pool.stockRegister(msg.locate, msg.stock)

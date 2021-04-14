@@ -9,5 +9,5 @@ export const timestampToTime = (ts: number) => {
     ':' + String(minutes).padStart(2, '0') +
     ':' + String(seconds).padStart(2, '0') +
     // Doing this trick to avoid precision errors in javascript..
-    '.' + String(rough_seconds).split('.').pop()
+    '.' + String(rough_seconds).split('.').pop()!.padStart(9, '0')
 }
