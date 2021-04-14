@@ -2,6 +2,8 @@ import { Message, MessageHeader, MessageType } from "../types";
 import { timestampToTime } from "../utils";
 
 export const getLocate = (buf: Buffer) => buf.readUInt16BE(1);
+export const getTimestamp = (buf: Buffer) => parseInt(buf.toString('hex', 5, 11), 16);
+export const getTimestampHuman = (buf: Buffer) => timestampToTime(parseInt(buf.toString('hex', 5, 11), 16));
 
 const parseHeader = (type: MessageType, buf: Buffer): MessageHeader => ({
 	type,

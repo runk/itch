@@ -3,6 +3,11 @@ import { MessageType } from '../types';
 
 type OnMessageFn = (type: MessageType, msg: Buffer) => void;
 
+// @ts-ignore
+const debug = (msg: string) => {
+  // console.log('reader: %s', msg);
+}
+
 export default (source: string, onMessage: OnMessageFn) => {
   // const stream = fs.createReadStream(source, { start: 0, end: 10 * 7000000 });
   const stream = fs.createReadStream(source);
@@ -39,7 +44,7 @@ export default (source: string, onMessage: OnMessageFn) => {
       // const msg = parse(type, message)
       onMessage(type as MessageType, message);
 
-      if (seq % 1e6 == 0) console.log('> seq', seq)
+      if (seq % 1e6 == 0) debug(`seq: ${seq}`)
 
       offset = offset + 2 + size;
     } while (offset < buf.length);
@@ -51,6 +56,6 @@ export default (source: string, onMessage: OnMessageFn) => {
   });
 
   stream.on("end", () => {
-    console.log("> end");
+    debug("stream end");
   });
 }
