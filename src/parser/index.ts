@@ -128,9 +128,26 @@ export class MessageOrderReplace extends Base {
 	constructor(buf: Buffer) {
 		super(buf);
 		this.reference = buf.toString('hex', 11, 19)
-		this.referenceNew = buf.toString('hex', 19, 27),
-			this.shares = buf.readUInt32BE(27)
+		this.referenceNew = buf.toString('hex', 19, 27)
+		this.shares = buf.readUInt32BE(27)
 		this.price = buf.readUInt32BE(31)
+	}
+}
+
+export class MessageTradeCross extends Base {
+	readonly shares: number;
+	readonly stock: string
+	readonly price: number;
+	readonly match: string;
+	readonly crossType: string;
+
+	constructor(buf: Buffer) {
+		super(buf);
+		this.shares = buf.readUInt32BE(11)
+		this.stock = buf.toString('latin1', 19, 27)
+		this.price = buf.readUInt32BE(27)
+		this.match = buf.toString('hex', 31, 39)
+		this.crossType = buf.toString('latin1', 39, 40)
 	}
 }
 

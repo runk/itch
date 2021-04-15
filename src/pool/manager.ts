@@ -1,7 +1,7 @@
 import { assert } from "console";
 import { getTokenSourceMapRange } from "typescript";
 import Pool, { Order } from ".";
-import { getLocate, getTimestampHuman, MessageAddOrder, MessageOrderCancel, MessageOrderDelete, MessageOrderExecuted, MessageOrderExecutedWithPrice, MessageOrderReplace, MessageStockDirectory } from "../parser";
+import { getLocate, getTimestampHuman, MessageAddOrder, MessageOrderCancel, MessageOrderDelete, MessageOrderExecuted, MessageOrderExecutedWithPrice, MessageOrderReplace, MessageStockDirectory, MessageTradeCross } from "../parser";
 import { MessageType } from "../types";
 
 export default (pool: Pool) => {
@@ -16,22 +16,29 @@ export default (pool: Pool) => {
 
     let msg, order;
     switch (type) {
+      case MessageType.StockDirectory:
+        msg = new MessageStockDirectory(buf);
+
+        console.log(msg.toString(), msg)
+        pool.stockRegister(msg.locate, msg.stock)
+        break;
+
       case MessageType.AddOrder:
       case MessageType.AddOrderWithAttribution:
         msg = new MessageAddOrder(buf)
-        console.log(msg.toString())
+        console.log(msg.toString(), msg)
         pool.add(msg.stock, msg.locate, msg.price, msg.shares, msg.reference, msg.side);
         break;
 
       case MessageType.OrderDelete:
         msg = new MessageOrderDelete(buf);
-        console.log(msg.toString())
+        console.log(msg.toString(), msg)
         pool.delete(msg.reference)
         break;
 
       case MessageType.OrderCancel:
         msg = new MessageOrderCancel(buf);
-        console.log(msg.toString())
+        console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares)
         break;
 
@@ -42,7 +49,7 @@ export default (pool: Pool) => {
           throw new Error('Order not found')
         }
 
-        console.log(msg.toString())
+        console.log(msg.toString(), msg)
         pool.add(order.stock, msg.locate, msg.price, msg.shares, msg.referenceNew, order.side)
         pool.delete(msg.reference)
         break
@@ -50,7 +57,7 @@ export default (pool: Pool) => {
       case MessageType.OrderExecutedWithPrice:
         msg = new MessageOrderExecutedWithPrice(buf);
 
-        console.log(msg.toString())
+        console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares)
         break
 
@@ -60,16 +67,16 @@ export default (pool: Pool) => {
         order = pool.get(msg.reference)
         assert(order)
 
-        console.log(msg.toString())
+        console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares)
         break;
 
       case MessageType.StockDirectory:
-        msg = new MessageStockDirectory(buf);
+        msg = new MessageTradeCross(buf);
 
-        console.log(msg.toString())
-        pool.stockRegister(msg.locate, msg.stock)
+        console.log(msg.toString(), msg)
         break;
+
     }
   }
 

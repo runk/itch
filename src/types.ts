@@ -16,6 +16,10 @@ export enum MessageType {
   OrderDelete = 'D',
 
   OrderReplace = 'U',
+
+  // Trade
+  TradeCross = 'Q',
+  TradeNonCross = 'P',
 }
 
 export type MessageHeader = {
