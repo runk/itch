@@ -34,7 +34,3 @@ export const bookToString = (book: OrderBook): string => {
   out += book.sell.map(order => `S ${order.price/1e4}\t${order.shares}`).join('\n');
   return out;
 }
-
-// export const getSpread = (book:OrderBook): => {
-
-// }
