@@ -1,6 +1,7 @@
 import { assert } from 'console';
 import { getTokenSourceMapRange } from 'typescript';
 import Pool, { Order } from '.';
+import { bookToString, poolToBook } from '../order-book';
 import {
   getLocate,
   getTimestampHuman,
@@ -93,8 +94,10 @@ export default (pool: Pool) => {
         assert(order);
 
         console.log(msg.toString(), order!.price / 1e4, order?.side);
+
         // console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares);
+        console.log(bookToString(poolToBook(pool, 'AAPL    ', 10)))
         break;
 
       case MessageType.TradeCross:

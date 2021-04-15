@@ -26,3 +26,15 @@ export const poolToBook = (pool: Pool, stock: string, limit?: number) => {
   }
   return { sell, buy };
 };
+
+export const bookToString = (book: OrderBook): string => {
+  let out = '';
+  out += book.buy.reverse().map(order => `B ${order.price/1e4}\t${order.shares}`).join('\n')
+  out += '\n-----\n';
+  out += book.sell.map(order => `S ${order.price/1e4}\t${order.shares}`).join('\n');
+  return out;
+}
+
+// export const getSpread = (book:OrderBook): => {
+
+// }
