@@ -26,19 +26,19 @@ export default (pool: Pool) => {
       case MessageType.AddOrder:
       case MessageType.AddOrderWithAttribution:
         msg = new MessageAddOrder(buf)
-        console.log(msg.toString(), msg)
+        // console.log(msg.toString(), msg)
         pool.add(msg.stock, msg.locate, msg.price, msg.shares, msg.reference, msg.side);
         break;
 
       case MessageType.OrderDelete:
         msg = new MessageOrderDelete(buf);
-        console.log(msg.toString(), msg)
+        // console.log(msg.toString(), msg)
         pool.delete(msg.reference)
         break;
 
       case MessageType.OrderCancel:
         msg = new MessageOrderCancel(buf);
-        console.log(msg.toString(), msg)
+        // console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares)
         break;
 
@@ -49,7 +49,7 @@ export default (pool: Pool) => {
           throw new Error('Order not found')
         }
 
-        console.log(msg.toString(), msg)
+        // console.log(msg.toString(), msg)
         pool.add(order.stock, msg.locate, msg.price, msg.shares, msg.referenceNew, order.side)
         pool.delete(msg.reference)
         break
@@ -67,14 +67,15 @@ export default (pool: Pool) => {
         order = pool.get(msg.reference)
         assert(order)
 
-        console.log(msg.toString(), msg)
+        console.log(msg.toString(), order!.price / 1e4, order?.side)
+        // console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares)
         break;
 
-      case MessageType.StockDirectory:
+      case MessageType.TradeCross:
         msg = new MessageTradeCross(buf);
 
-        console.log(msg.toString(), msg)
+        // console.log(msg.toString(), msg)
         break;
 
     }
