@@ -1,4 +1,3 @@
-
 export enum MessageType {
   // System
   System = 'S',
@@ -23,11 +22,11 @@ export enum MessageType {
 }
 
 export type MessageHeader = {
-  type: MessageType,
-  locate: number,
-  tracking: number,
-  timestamp: number,
-}
+  type: MessageType;
+  locate: number;
+  tracking: number;
+  timestamp: number;
+};
 
 // export interface MessageBody =
 //   reference?: string;
@@ -37,6 +36,6 @@ export type MessageHeader = {
 // }
 
 export interface Message<T = unknown> {
-  header: MessageHeader,
-  body: T
+  header: MessageHeader;
+  body: T;
 }

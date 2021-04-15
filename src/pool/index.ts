@@ -1,21 +1,23 @@
-import { assert } from "console";
+import { assert } from 'console';
+
+export const SIDE_BUY = 'B';
+export const SIDE_SELL = 'S';
 
 export type Order = {
-  id: number;
-  stock: string
-  locate: number
-  price: number
-  shares: number
-  reference: string
-  side: string
-}
+  stock: string;
+  locate: number;
+  price: number;
+  shares: number;
+  reference: string;
+  side: string;
+};
 
 type Locates = Map<number, string>;
-type PoolStore = Map<string, Order>
+type PoolStore = Map<string, Order>;
 
 export default class Pool {
   private locates: Locates;
-  private store: PoolStore
+  readonly store: PoolStore;
   constructor() {
     this.locates = new Map();
     this.store = new Map();
@@ -33,9 +35,15 @@ export default class Pool {
     return this.locates.get(locate);
   }
 
-  add(stock: string, locate: number, price: number, shares: number, reference: string, side: string) {
+  add(
+    stock: string,
+    locate: number,
+    price: number,
+    shares: number,
+    reference: string,
+    side: string
+  ) {
     this.store.set(reference, {
-      id: Math.random(),
       stock,
       locate,
       price,
@@ -49,13 +57,12 @@ export default class Pool {
     //     console.log(ref, order)
     //   })
     // }
-    if (this.store.size % 1e3 == 0)
-      console.log('>>>', this.store.size)
+    if (this.store.size % 1e3 == 0) console.log('>>>', this.store.size);
   }
 
   delete(reference: string) {
-    const ok = this.store.delete(reference)
-    assert(ok)
+    const ok = this.store.delete(reference);
+    assert(ok);
   }
 
   modify(reference: string, executedShares: number) {
@@ -69,11 +76,11 @@ export default class Pool {
       return;
     }
 
-    order.shares -= executedShares
+    order.shares -= executedShares;
     assert(order.shares > 0);
   }
 
   get(reference: string): Order | undefined {
-    return this.store.get(reference)
+    return this.store.get(reference);
   }
 }

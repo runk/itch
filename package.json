@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "format": "prettier --write .",
     "start": "ts-node src/index.ts"
   },
   "author": "",
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "jest": "^26.6.3",
+    "prettier": "^2.2.1",
     "ts-jest": "^26.5.4"
   }
 }
