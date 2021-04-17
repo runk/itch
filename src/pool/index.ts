@@ -1,4 +1,4 @@
-import { assert } from 'console';
+import assert from 'assert'
 import { Order } from '../order';
 
 type Locates = Map<number, string>;
@@ -32,11 +32,14 @@ export default class Pool {
 
   delete(reference: string) {
     const ok = this.store.delete(reference);
-    assert(ok);
+    assert(ok, 'Order was not deleted');
   }
 
   modify(reference: string, executedShares: number) {
     const order = this.get(reference);
+    if (reference == '000000000003dc79') {
+      console.log(order)
+    }
     if (order === undefined) {
       throw new Error('No orders to modify');
     }
@@ -47,7 +50,7 @@ export default class Pool {
     }
 
     order.shares -= executedShares;
-    assert(order.shares > 0);
+    assert(order.shares > 0, 'Shares <= 0');
   }
 
   get(reference: string): Order | undefined {

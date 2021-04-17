@@ -63,7 +63,7 @@ export class OrderBook {
       return;
     }
 
-    throw new Error('Cannot find order to modify');
+    throw new Error(`Cannot find order to modify, ref: ${reference}`);
   }
 
   toString() {

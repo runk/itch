@@ -1,7 +1,6 @@
-import { assert } from 'console';
-import { getTokenSourceMapRange } from 'typescript';
-import Pool, { Order } from './pool';
-import { bookToString, OrderBook, poolToBook } from './order-book';
+import assert from 'assert';
+import Pool from './pool';
+import { OrderBook } from './order-book';
 import {
   getLocate,
   getTimestampHuman,
@@ -14,6 +13,7 @@ import {
   MessageStockDirectory,
 } from './parser';
 import { MessageType } from './types';
+import { Order } from './order';
 
 export default (pool: Pool, book: OrderBook) => {
   const onMessage = (type: MessageType, buf: Buffer) => {
@@ -99,13 +99,14 @@ export default (pool: Pool, book: OrderBook) => {
         msg = new MessageOrderExecuted(buf);
 
         order = pool.get(msg.reference);
-        assert(order);
+        assert(order, 'Failure!');
 
         console.log(msg.toString(), order!.price / 1e4, order?.side);
 
         // console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares);
         book.modify(msg.reference, msg.shares);
+        console.log(book.getSpread())
         // console.log(bookToString(poolToBook(pool, 'AAPL    ', 10)));
         break;
     }
