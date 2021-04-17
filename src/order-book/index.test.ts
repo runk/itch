@@ -1,5 +1,5 @@
-import { Order } from '../pool';
-import { bookToString, OrderBook, poolToBook } from '.';
+import { OrderBook } from '.';
+import { Order } from '../order';
 
 const makeOrder = (
   stock: string,
@@ -32,7 +32,7 @@ const makeBook = (limit?: number) => {
   return book;
 };
 
-describe('add()', () => {
+describe('constructor()', () => {
   it('basic', () => {
     const book = makeBook();
 
@@ -116,7 +116,16 @@ describe('add()', () => {
   });
 });
 
-describe('bookToString()', () => {
+describe('getSpread()', () => {
+  it('works', () => {
+    const book = makeBook(1);
+    const [bid, ask] = book.getSpread();
+    expect(bid).toBe(10000);
+    expect(ask).toBe(10200);
+  });
+});
+
+describe('toString()', () => {
   it('basic', () => {
     const book = makeBook();
     expect(book.toString()).toBe(

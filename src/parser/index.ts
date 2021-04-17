@@ -7,12 +7,12 @@ export const getTimestamp = (buf: Buffer) =>
 export const getTimestampHuman = (buf: Buffer) =>
   timestampToTime(parseInt(buf.toString('hex', 5, 11), 16));
 
-const parseHeader = (type: MessageType, buf: Buffer): MessageHeader => ({
-  type,
-  locate: buf.readUInt16BE(1),
-  tracking: buf.readUInt16BE(3),
-  timestamp: parseInt(buf.toString('hex', 5, 11), 16),
-});
+// const parseHeader = (type: MessageType, buf: Buffer): MessageHeader => ({
+//   type,
+//   locate: buf.readUInt16BE(1),
+//   tracking: buf.readUInt16BE(3),
+//   timestamp: parseInt(buf.toString('hex', 5, 11), 16),
+// });
 
 class Base {
   readonly locate: number;

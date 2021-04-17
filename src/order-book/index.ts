@@ -1,4 +1,4 @@
-import Pool, { Order, SIDE_BUY } from '../pool';
+import { SIDE_SELL, Order, orderToString } from '../order';
 
 export class OrderBook {
   buy: Order[];
@@ -12,7 +12,7 @@ export class OrderBook {
   }
 
   add(order: Order) {
-    if (order.side == 'S') {
+    if (order.side == SIDE_SELL) {
       this.sell.push(order);
       this.sell.sort((a, b) => a.price - b.price);
     } else {
@@ -68,49 +68,16 @@ export class OrderBook {
 
   toString() {
     let out = '';
-    out += this.buy
-      .reverse()
-      .map((order) => `${order.side} ${order.price / 1e4}\t${order.shares}`)
-      .join('\n');
+    out += this.buy.reverse().map(orderToString).join('\n');
     out += '\n-----\n';
-    out += this.sell
-      .map((order) => `${order.side} ${order.price / 1e4}\t${order.shares}`)
-      .join('\n');
+    out += this.sell.map(orderToString).join('\n');
     return out;
   }
+
+  /**
+   * @returns bid-ask spread
+   */
+  getSpread() {
+    return [this.buy[0].price, this.sell[0].price];
+  }
 }
-
-export const poolToBook = (pool: Pool, stock: string, limit?: number) => {
-  const sell: Order[] = [];
-  const buy: Order[] = [];
-  for (const order of pool.store.values()) {
-    if (order.stock !== stock) continue;
-    if (order.side === SIDE_BUY) {
-      buy.push(order);
-    } else {
-      sell.push(order);
-    }
-  }
-
-  sell.sort((a, b) => a.price - b.price);
-  buy.sort((a, b) => b.price - a.price);
-
-  if (limit !== undefined) {
-    sell.splice(limit);
-    buy.splice(limit);
-  }
-  return { sell, buy };
-};
-
-export const bookToString = (book: OrderBook): string => {
-  let out = '';
-  out += book.buy
-    .reverse()
-    .map((order) => `B ${order.price / 1e4}\t${order.shares}`)
-    .join('\n');
-  out += '\n-----\n';
-  out += book.sell
-    .map((order) => `S ${order.price / 1e4}\t${order.shares}`)
-    .join('\n');
-  return out;
-};

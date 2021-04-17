@@ -1,16 +1,5 @@
 import { assert } from 'console';
-
-export const SIDE_BUY = 'B';
-export const SIDE_SELL = 'S';
-
-export type Order = {
-  stock: string;
-  locate: number;
-  price: number;
-  shares: number;
-  reference: string;
-  side: string;
-};
+import { Order } from '../order';
 
 type Locates = Map<number, string>;
 type PoolStore = Map<string, Order>;

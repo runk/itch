@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest",
     "format": "prettier --write .",
     "start": "ts-node src/index.ts"
