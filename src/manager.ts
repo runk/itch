@@ -90,24 +90,39 @@ export default (pool: Pool, book: OrderBook) => {
       case MessageType.OrderExecutedWithPrice:
         msg = new MessageOrderExecutedWithPrice(buf);
 
-        console.log(msg.toString(), msg);
-        pool.modify(msg.reference, msg.shares);
-        book.modify(msg.reference, msg.shares);
+        order = pool.get(msg.reference);
+        assert(order, 'Order not found');
+
+        console.log(msg.toString(), order!.price / 1e4, order?.side);
+
+        // change by reference
+        order.shares -= msg.shares;
+
+        if (order.shares === 0) {
+          pool.delete(order.reference);
+          book.delete(order.reference);
+        }
+        // console.log(msg.toString(), msg)
+        console.log(book.getSpread())
         break;
 
       case MessageType.OrderExecuted:
         msg = new MessageOrderExecuted(buf);
 
         order = pool.get(msg.reference);
-        assert(order, 'Failure!');
+        assert(order, 'Order not found');
 
         console.log(msg.toString(), order!.price / 1e4, order?.side);
 
+        // change by reference
+        order.shares -= msg.shares;
+
+        if (order.shares === 0) {
+          pool.delete(order.reference);
+          book.delete(order.reference);
+        }
         // console.log(msg.toString(), msg)
-        pool.modify(msg.reference, msg.shares);
-        book.modify(msg.reference, msg.shares);
         console.log(book.getSpread())
-        // console.log(bookToString(poolToBook(pool, 'AAPL    ', 10)));
         break;
     }
   };
