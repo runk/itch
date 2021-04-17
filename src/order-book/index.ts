@@ -1,5 +1,8 @@
 import Pool, { Order, SIDE_BUY } from '../pool';
 
+export default () => {
+
+}
 export type OrderBook = {
   buy: Order[];
   sell: Order[];

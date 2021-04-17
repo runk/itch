@@ -48,7 +48,6 @@ export default class Pool {
       locate,
       price,
       shares,
-      // TODO: do not need?
       reference,
       side,
     });

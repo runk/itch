@@ -1,5 +1,5 @@
 import Pool from './pool';
-import newPoolManager from './pool/manager';
+import newPoolManager from './manager';
 import reader from './reader';
 import { MessageType } from './types';
 

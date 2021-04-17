@@ -1,7 +1,7 @@
 import { assert } from 'console';
 import { getTokenSourceMapRange } from 'typescript';
-import Pool, { Order } from '.';
-import { bookToString, poolToBook } from '../order-book';
+import Pool, { Order } from './pool';
+import { bookToString, poolToBook } from './order-book';
 import {
   getLocate,
   getTimestampHuman,
@@ -12,9 +12,8 @@ import {
   MessageOrderExecutedWithPrice,
   MessageOrderReplace,
   MessageStockDirectory,
-  MessageTradeCross,
-} from '../parser';
-import { MessageType } from '../types';
+} from './parser';
+import { MessageType } from './types';
 
 export default (pool: Pool) => {
   const onMessage = (type: MessageType, buf: Buffer) => {
@@ -98,12 +97,6 @@ export default (pool: Pool) => {
         // console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares);
         console.log(bookToString(poolToBook(pool, 'AAPL    ', 10)))
-        break;
-
-      case MessageType.TradeCross:
-        msg = new MessageTradeCross(buf);
-
-        // console.log(msg.toString(), msg)
         break;
     }
   };
