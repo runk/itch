@@ -1,5 +1,9 @@
 import { SIDE_SELL, Order, orderToString } from '../order';
 
+// type Level {
+//   price
+// }
+
 export class OrderBook {
   buy: Order[];
   sell: Order[];
@@ -48,6 +52,7 @@ export class OrderBook {
       if (this.buy[index].shares === shares) {
         this.buy.splice(index, 1);
       } else {
+        // bad
         this.buy[index].shares -= shares;
       }
       return;
@@ -58,6 +63,7 @@ export class OrderBook {
       if (this.sell[index].shares === shares) {
         this.sell.splice(index, 1);
       } else {
+        // bad
         this.sell[index].shares -= shares;
       }
       return;

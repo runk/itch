@@ -61,8 +61,19 @@ export default (pool: Pool, book: OrderBook) => {
       case MessageType.OrderCancel:
         msg = new MessageOrderCancel(buf);
         // console.log(msg.toString(), msg)
-        pool.modify(msg.reference, msg.shares);
-        book.modify(msg.reference, msg.shares);
+        order = pool.get(msg.reference);
+        assert(order, 'Order not found');
+
+        // change by reference
+        order.shares -= msg.shares;
+
+        if (order.shares === 0) {
+          pool.delete(order.reference);
+          book.delete(order.reference);
+        }
+
+        // pool.modify(msg.reference, msg.shares);
+        // book.modify(msg.reference, msg.shares);
         break;
 
       case MessageType.OrderReplace:

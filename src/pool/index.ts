@@ -37,9 +37,6 @@ export default class Pool {
 
   modify(reference: string, executedShares: number) {
     const order = this.get(reference);
-    if (reference == '000000000003dc79') {
-      console.log(order)
-    }
     if (order === undefined) {
       throw new Error('No orders to modify');
     }
