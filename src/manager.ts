@@ -1,7 +1,7 @@
 import { assert } from 'console';
 import { getTokenSourceMapRange } from 'typescript';
 import Pool, { Order } from './pool';
-import { bookToString, poolToBook } from './order-book';
+import { bookToString, OrderBook, poolToBook } from './order-book';
 import {
   getLocate,
   getTimestampHuman,
@@ -15,7 +15,7 @@ import {
 } from './parser';
 import { MessageType } from './types';
 
-export default (pool: Pool) => {
+export default (pool: Pool, book: OrderBook) => {
   const onMessage = (type: MessageType, buf: Buffer) => {
     // Listen for AAPL only
     if (getLocate(buf) != 13) return;
@@ -25,7 +25,8 @@ export default (pool: Pool) => {
       process.exit(1);
     }
 
-    let msg, order;
+    let msg;
+    let order: Order | undefined;
     switch (type) {
       case MessageType.StockDirectory:
         msg = new MessageStockDirectory(buf);
@@ -38,26 +39,30 @@ export default (pool: Pool) => {
       case MessageType.AddOrderWithAttribution:
         msg = new MessageAddOrder(buf);
         // console.log(msg.toString(), msg)
-        pool.add(
-          msg.stock,
-          msg.locate,
-          msg.price,
-          msg.shares,
-          msg.reference,
-          msg.side
-        );
+        order = {
+          stock: msg.stock,
+          locate: msg.locate,
+          price: msg.price,
+          shares: msg.shares,
+          reference: msg.reference,
+          side: msg.side,
+        };
+        pool.add(order);
+        book.add(order);
         break;
 
       case MessageType.OrderDelete:
         msg = new MessageOrderDelete(buf);
         // console.log(msg.toString(), msg)
         pool.delete(msg.reference);
+        book.delete(msg.reference);
         break;
 
       case MessageType.OrderCancel:
         msg = new MessageOrderCancel(buf);
         // console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares);
+        book.modify(msg.reference, msg.shares);
         break;
 
       case MessageType.OrderReplace:
@@ -68,15 +73,18 @@ export default (pool: Pool) => {
         }
 
         // console.log(msg.toString(), msg)
-        pool.add(
-          order.stock,
-          msg.locate,
-          msg.price,
-          msg.shares,
-          msg.referenceNew,
-          order.side
-        );
+        order = {
+          stock: order.stock,
+          locate: msg.locate,
+          price: msg.price,
+          shares: msg.shares,
+          reference: msg.referenceNew,
+          side: order.side,
+        };
         pool.delete(msg.reference);
+        book.delete(msg.reference);
+        pool.add(order);
+        book.add(order);
         break;
 
       case MessageType.OrderExecutedWithPrice:
@@ -84,6 +92,7 @@ export default (pool: Pool) => {
 
         console.log(msg.toString(), msg);
         pool.modify(msg.reference, msg.shares);
+        book.modify(msg.reference, msg.shares);
         break;
 
       case MessageType.OrderExecuted:
@@ -96,7 +105,8 @@ export default (pool: Pool) => {
 
         // console.log(msg.toString(), msg)
         pool.modify(msg.reference, msg.shares);
-        console.log(bookToString(poolToBook(pool, 'AAPL    ', 10)))
+        book.modify(msg.reference, msg.shares);
+        // console.log(bookToString(poolToBook(pool, 'AAPL    ', 10)));
         break;
     }
   };

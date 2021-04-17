@@ -35,28 +35,10 @@ export default class Pool {
     return this.locates.get(locate);
   }
 
-  add(
-    stock: string,
-    locate: number,
-    price: number,
-    shares: number,
-    reference: string,
-    side: string
-  ) {
-    this.store.set(reference, {
-      stock,
-      locate,
-      price,
-      shares,
-      reference,
-      side,
-    });
-    // if (this.store.size >= 25000) {
-    //   this.store.forEach((order, ref) => {
-    //     console.log(ref, order)
-    //   })
-    // }
-    if (this.store.size % 1e3 == 0) console.log('>>>', this.store.size);
+  add(order: Order) {
+    this.store.set(order.reference, order);
+    // if (this.store.size % 1e3 == 0) console.log('>>>', this.store.size);
+    return order;
   }
 
   delete(reference: string) {
