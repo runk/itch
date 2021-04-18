@@ -13,7 +13,7 @@ import {
   MessageStockDirectory,
 } from './parser';
 import { MessageType } from './types';
-import { Order } from './order';
+import { Order, Side } from './order';
 
 export default (pool: Pool, book: OrderBook) => {
   const onMessage = (type: MessageType, buf: Buffer) => {
@@ -45,7 +45,7 @@ export default (pool: Pool, book: OrderBook) => {
           price: msg.price,
           shares: msg.shares,
           reference: msg.reference,
-          side: msg.side,
+          side: msg.side as Side,
         };
         pool.add(order);
         book.add(order);

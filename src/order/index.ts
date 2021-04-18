@@ -1,5 +1,4 @@
-export const SIDE_BUY = 'B';
-export const SIDE_SELL = 'S';
+export type Side = 'B' | 'S';
 
 export type Order = {
   stock: string;
@@ -7,7 +6,7 @@ export type Order = {
   price: number;
   shares: number;
   reference: string;
-  side: string;
+  side: Side;
 };
 
 export const orderToString = (order: Order) =>

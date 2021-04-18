@@ -1,34 +1,14 @@
-import { OrderBook } from '.';
+import { SimpleOrderBook } from '.';
 import { Order } from '../order';
 
-const makeOrder = (
-  stock: string,
-  locate: number,
-  price: number,
-  shares: number,
-  reference: string,
-  side: string
-): Order => ({
-  stock,
-  locate,
-  price,
-  shares,
-  reference,
-  side,
-});
-
 const makeBook = (limit?: number) => {
-  const book = new OrderBook(limit);
-  book.add(makeOrder('ABC', 1, 9500, 10, 'abc-1', 'B'));
-  book.add(makeOrder('ABC', 1, 10000, 10, 'abc-2', 'B'));
-  book.add(makeOrder('ABC', 1, 9900, 10, 'abc-3', 'B'));
-
-  book.add(makeOrder('ABC', 1, 10400, 10, 'abc-4', 'S'));
-  book.add(makeOrder('ABC', 1, 10200, 10, 'abc-5', 'S'));
-  book.add(makeOrder('ABC', 1, 11000, 10, 'abc-6', 'S'));
-
-  // book.add(makeOrder('XYZ', 1, 50000, 10, 'xyz-1', 'S'));
-  // book.add(makeOrder('XYZ', 1, 49000, 10, 'xyz-2', 'B'));
+  const book = new SimpleOrderBook(limit);
+  book.add('S', 10000, 500);
+  book.add('S', 10000, 1000);
+  book.add('S', 10500, 2000);
+  book.add('B', 9900, 5000);
+  book.add('B', 9100, 4000);
+  book.add('B', 9000, 1000);
   return book;
 };
 
@@ -36,83 +16,19 @@ describe('constructor()', () => {
   it('basic', () => {
     const book = makeBook();
 
-    expect(book.buy).toEqual([
-      {
-        stock: 'ABC',
-        locate: 1,
-        price: 10000,
-        shares: 10,
-        reference: 'abc-2',
-        side: 'B',
-      },
-      {
-        stock: 'ABC',
-        locate: 1,
-        price: 9900,
-        shares: 10,
-        reference: 'abc-3',
-        side: 'B',
-      },
-      {
-        stock: 'ABC',
-        locate: 1,
-        price: 9500,
-        shares: 10,
-        reference: 'abc-1',
-        side: 'B',
-      },
-    ]);
-    expect(book.sell).toEqual([
-      {
-        stock: 'ABC',
-        locate: 1,
-        price: 10200,
-        shares: 10,
-        reference: 'abc-5',
-        side: 'S',
-      },
-      {
-        stock: 'ABC',
-        locate: 1,
-        price: 10400,
-        shares: 10,
-        reference: 'abc-4',
-        side: 'S',
-      },
-      {
-        stock: 'ABC',
-        locate: 1,
-        price: 11000,
-        shares: 10,
-        reference: 'abc-6',
-        side: 'S',
-      },
-    ]);
-  });
-
-  it('with limit', () => {
-    const book = makeBook(1);
-
-    expect(book.buy).toEqual([
-      {
-        stock: 'ABC',
-        locate: 1,
-        price: 10000,
-        shares: 10,
-        reference: 'abc-2',
-        side: 'B',
-      },
-    ]);
-    expect(book.sell).toEqual([
-      {
-        stock: 'ABC',
-        locate: 1,
-        price: 10200,
-        shares: 10,
-        reference: 'abc-5',
-        side: 'S',
-      },
-    ]);
+    expect(book.buy).toMatchInlineSnapshot(`
+      Map {
+        9900 => 5000,
+        9100 => 4000,
+        9000 => 1000,
+      }
+    `);
+    expect(book.sell).toMatchInlineSnapshot(`
+      Map {
+        10000 => 1500,
+        10500 => 2000,
+      }
+    `);
   });
 });
 
@@ -120,22 +36,22 @@ describe('getSpread()', () => {
   it('works', () => {
     const book = makeBook(1);
     const [bid, ask] = book.getSpread();
-    expect(bid).toBe(10000);
-    expect(ask).toBe(10200);
+    expect(bid).toBe(9900);
+    expect(ask).toBe(10000);
   });
 });
 
 describe('toString()', () => {
   it('basic', () => {
     const book = makeBook();
-    expect(book.toString()).toBe(
-      `B 0.95	10
-B 0.99	10
-B 1	10
------
-S 1.02	10
-S 1.04	10
-S 1.1	10`
-    );
+    expect(book.toString()).toMatchInlineSnapshot(`
+      "B 0.90: 1000
+      B 0.91: 4000
+      B 0.99: 5000
+      -----
+      S 1.00: 1500
+      S 1.05: 2000
+      "
+    `);
   });
 });

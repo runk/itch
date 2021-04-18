@@ -1,89 +1,78 @@
-import { SIDE_SELL, Order, orderToString } from '../order';
+import assert from 'assert';
 
-// type Level {
-//   price
-// }
+type Shares = number;
+type Price = number;
 
-export class OrderBook {
-  buy: Order[];
-  sell: Order[];
+
+const toArray = (map: Map<Price, Shares>): Price[] => {
+  return Array<Price>(...map.keys()).sort((a, b) => a - b);
+}
+
+export class SimpleOrderBook {
   limit?: number;
 
+  buy: Map<Price, Shares>;
+  sell: Map<Price, Shares>;
+
   constructor(limit?: number) {
-    this.buy = [];
-    this.sell = [];
     this.limit = limit;
+
+    this.buy = new Map<Price, Shares>();
+    this.sell = new Map<Price, Shares>();
   }
 
-  add(order: Order) {
-    if (order.side == SIDE_SELL) {
-      this.sell.push(order);
-      this.sell.sort((a, b) => a.price - b.price);
+  /**
+   * Adds liquidity to the order book
+   *
+   * @param side
+   * @param price
+   * @param volume
+   */
+  add(side: string, price: Price, volume: Shares) {
+    const container = (side === 'S') ? this.sell : this.buy;
+    const current = container.get(price) || 0;
+    container.set(price, current + volume);
+  }
+
+  /**
+   * Removes liquidity from the order book
+   *
+   * @param side
+   * @param price
+   * @param volume
+   */
+  remove(side: string, price: Price, volume: Shares) {
+    const container = (side === 'S') ? this.sell : this.buy;
+    const current = container.get(price) || 0;
+    assert(current >= volume, "Cannot remove more volume than total at this level")
+
+    if (volume === current) {
+      container.delete(price);
     } else {
-      this.buy.push(order);
-      this.buy.sort((a, b) => b.price - a.price);
+      this.sell.set(price, current - volume);
     }
-
-    if (this.limit !== undefined) {
-      this.sell.splice(this.limit);
-      this.buy.splice(this.limit);
-    }
-  }
-
-  delete(reference: string) {
-    let index = this.buy.findIndex((order) => order.reference === reference);
-    if (index > -1) {
-      this.buy.splice(index, 1);
-      return;
-    }
-
-    index = this.sell.findIndex((order) => order.reference === reference);
-    if (index > -1) {
-      this.sell.splice(index, 1);
-      return;
-    }
-
-    throw new Error('Cannot find order to delete');
-  }
-
-  modify(reference: string, shares: number) {
-    let index = this.buy.findIndex((order) => order.reference === reference);
-    if (index > -1) {
-      if (this.buy[index].shares === shares) {
-        this.buy.splice(index, 1);
-      } else {
-        // bad
-        this.buy[index].shares -= shares;
-      }
-      return;
-    }
-
-    index = this.sell.findIndex((order) => order.reference === reference);
-    if (index > -1) {
-      if (this.sell[index].shares === shares) {
-        this.sell.splice(index, 1);
-      } else {
-        // bad
-        this.sell[index].shares -= shares;
-      }
-      return;
-    }
-
-    throw new Error(`Cannot find order to modify, ref: ${reference}`);
   }
 
   toString() {
     let out = '';
-    out += this.buy.reverse().map(orderToString).join('\n');
-    out += '\n-----\n';
-    out += this.sell.map(orderToString).join('\n');
+    const bidLevels = toArray(this.buy).slice(0, this.limit);
+    const askLevels = toArray(this.sell).slice(0, this.limit);
+
+    for (const level of bidLevels) {
+      out += `B ${(level / 1e4).toFixed(2)}: ${this.buy.get(level)}\n`
+    }
+    out += '-----\n';
+    for (const level of askLevels) {
+      out += `S ${(level / 1e4).toFixed(2)}: ${this.sell.get(level)}\n`
+    }
     return out;
   }
 
   /**
    * @returns bid-ask spread
    */
-  getSpread() {
-    return [this.buy[0].price, this.sell[0].price];
+  getSpread(): Price[] {
+    const totalBids = this.buy.size;
+    return [toArray(this.buy)[totalBids - 1], toArray(this.sell)[0]];
   }
 }
