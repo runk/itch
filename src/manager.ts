@@ -21,7 +21,7 @@ export default (pool: Pool, book: OrderBook) => {
     if (getLocate(buf) != 13) return;
     // if (getTimestampHuman(buf) < '09:40') return;
     if (getTimestampHuman(buf) > '09:35') {
-      console.log('hardstop');
+      console.log('hard stop');
       process.exit(1);
     }
 
@@ -79,17 +79,15 @@ export default (pool: Pool, book: OrderBook) => {
         }
 
         // console.log(msg.toString(), msg)
-        order = {
+        pool.delete(msg.reference);
+        pool.add({
           stock: order.stock,
           locate: msg.locate,
           price: msg.price,
           shares: msg.shares,
           reference: msg.referenceNew,
           side: order.side,
-        };
-
-        pool.delete(msg.reference);
-        pool.add(order);
+        });
 
         book.remove(order.side, order.price, order.shares);
         book.add(order.side, msg.price, msg.shares);
