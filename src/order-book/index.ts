@@ -9,7 +9,7 @@ const toArray = (map: Map<Price, Shares>): Price[] => {
   return Array<Price>(...map.keys()).sort((a, b) => a - b);
 }
 
-export class SimpleOrderBook {
+export class OrderBook {
   limit?: number;
 
   buy: Map<Price, Shares>;
@@ -45,7 +45,7 @@ export class SimpleOrderBook {
   remove(side: Side, price: Price, volume: Shares) {
     const container = (side === 'S') ? this.sell : this.buy;
     const current = container.get(price) || 0;
-    assert(current >= volume, "Cannot remove more volume than total at this level")
+    assert(current >= volume, `Cannot remove more ${volume} volume than ${current} total at this level`)
 
     if (volume === current) {
       container.delete(price);

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import Pool from './pool';
-import { SimpleOrderBook } from './order-book';
+import { OrderBook } from './order-book';
 import {
   getLocate,
   getTimestampHuman,
@@ -15,7 +15,7 @@ import {
 import { MessageType } from './types';
 import { Order, Side } from './order';
 
-export default (pool: Pool, book: SimpleOrderBook) => {
+export default (pool: Pool, book: OrderBook) => {
   const onMessage = (type: MessageType, buf: Buffer) => {
     // Listen for AAPL only
     if (getLocate(buf) != 13) return;
