@@ -1,3 +1,4 @@
+import { Side } from '../order';
 import { Message, MessageHeader, MessageType } from '../types';
 import { timestampToTime } from '../utils';
 
@@ -26,15 +27,14 @@ class Base {
   }
 
   toString() {
-    return `${timestampToTime(this.timestamp)}  ${this.constructor.name} ${
-      this.locate
-    }`;
+    return `${timestampToTime(this.timestamp)}  ${this.constructor.name} ${this.locate
+      }`;
   }
 }
 
 export class MessageAddOrder extends Base {
   readonly reference: string;
-  readonly side: string;
+  readonly side: Side;
   readonly shares: number;
   readonly stock: string;
   readonly price: number;
@@ -42,7 +42,7 @@ export class MessageAddOrder extends Base {
   constructor(buf: Buffer) {
     super(buf);
     this.reference = buf.toString('hex', 11, 19);
-    this.side = buf.toString('latin1', 19, 20);
+    this.side = buf.toString('latin1', 19, 20) as Side;
     this.shares = buf.readUInt32BE(20);
     this.stock = buf.toString('latin1', 24, 32);
     this.price = buf.readUInt32BE(32);

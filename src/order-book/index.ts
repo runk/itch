@@ -1,4 +1,5 @@
 import assert from 'assert';
+import { Side } from '../order';
 
 type Shares = number;
 type Price = number;
@@ -28,7 +29,7 @@ export class SimpleOrderBook {
    * @param price
    * @param volume
    */
-  add(side: string, price: Price, volume: Shares) {
+  add(side: Side, price: Price, volume: Shares) {
     const container = (side === 'S') ? this.sell : this.buy;
     const current = container.get(price) || 0;
     container.set(price, current + volume);
@@ -41,7 +42,7 @@ export class SimpleOrderBook {
    * @param price
    * @param volume
    */
-  remove(side: string, price: Price, volume: Shares) {
+  remove(side: Side, price: Price, volume: Shares) {
     const container = (side === 'S') ? this.sell : this.buy;
     const current = container.get(price) || 0;
     assert(current >= volume, "Cannot remove more volume than total at this level")

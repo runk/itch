@@ -1,6 +1,6 @@
 import assert from 'assert';
 import Pool from './pool';
-import { OrderBook } from './order-book';
+import { SimpleOrderBook } from './order-book';
 import {
   getLocate,
   getTimestampHuman,
@@ -15,7 +15,7 @@ import {
 import { MessageType } from './types';
 import { Order, Side } from './order';
 
-export default (pool: Pool, book: OrderBook) => {
+export default (pool: Pool, book: SimpleOrderBook) => {
   const onMessage = (type: MessageType, buf: Buffer) => {
     // Listen for AAPL only
     if (getLocate(buf) != 13) return;
@@ -45,17 +45,20 @@ export default (pool: Pool, book: OrderBook) => {
           price: msg.price,
           shares: msg.shares,
           reference: msg.reference,
-          side: msg.side as Side,
+          side: msg.side,
         };
         pool.add(order);
-        book.add(order);
+        book.add(msg.side, msg.price, msg.shares);
         break;
 
       case MessageType.OrderDelete:
         msg = new MessageOrderDelete(buf);
         // console.log(msg.toString(), msg)
+        order = pool.get(msg.reference);
+        assert(order, 'Order not found');
+
         pool.delete(msg.reference);
-        book.delete(msg.reference);
+        book.remove(order.side, order.price, order.shares);
         break;
 
       case MessageType.OrderCancel:
@@ -64,16 +67,8 @@ export default (pool: Pool, book: OrderBook) => {
         order = pool.get(msg.reference);
         assert(order, 'Order not found');
 
-        // change by reference
-        order.shares -= msg.shares;
-
-        if (order.shares === 0) {
-          pool.delete(order.reference);
-          book.delete(order.reference);
-        }
-
-        // pool.modify(msg.reference, msg.shares);
-        // book.modify(msg.reference, msg.shares);
+        pool.modify(msg.reference, msg.shares);
+        book.remove(order.side, order.price, msg.shares);
         break;
 
       case MessageType.OrderReplace:
@@ -92,10 +87,12 @@ export default (pool: Pool, book: OrderBook) => {
           reference: msg.referenceNew,
           side: order.side,
         };
+
         pool.delete(msg.reference);
-        book.delete(msg.reference);
         pool.add(order);
-        book.add(order);
+
+        book.remove(order.side, order.price, order.shares);
+        book.add(order.side, msg.price, msg.shares);
         break;
 
       case MessageType.OrderExecutedWithPrice:
@@ -106,13 +103,9 @@ export default (pool: Pool, book: OrderBook) => {
 
         console.log(msg.toString(), order!.price / 1e4, order?.side);
 
-        // change by reference
-        order.shares -= msg.shares;
+        pool.modify(msg.reference, msg.shares);
+        book.remove(order.side, order.price, msg.shares);
 
-        if (order.shares === 0) {
-          pool.delete(order.reference);
-          book.delete(order.reference);
-        }
         // console.log(msg.toString(), msg)
         console.log(book.getSpread())
         break;
@@ -125,13 +118,9 @@ export default (pool: Pool, book: OrderBook) => {
 
         console.log(msg.toString(), order!.price / 1e4, order?.side);
 
-        // change by reference
-        order.shares -= msg.shares;
+        pool.modify(msg.reference, msg.shares);
+        book.remove(order.side, order.price, msg.shares);
 
-        if (order.shares === 0) {
-          pool.delete(order.reference);
-          book.delete(order.reference);
-        }
         // console.log(msg.toString(), msg)
         console.log(book.getSpread())
         break;
