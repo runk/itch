@@ -3,11 +3,16 @@ import assert from 'assert';
 type Shares = number;
 type Price = number;
 
+
+const toArray = (map: Map<Price, Shares>): Price[] => {
+  return Array<Price>(...map.keys()).sort((a, b) => a - b);
+}
+
 export class SimpleOrderBook {
   limit?: number;
 
   buy: Map<Price, Shares>;
-  sell: Map<Price, Shares>
+  sell: Map<Price, Shares>;
 
   constructor(limit?: number) {
     this.limit = limit;
@@ -50,8 +55,8 @@ export class SimpleOrderBook {
 
   toString() {
     let out = '';
-    const bidLevels = Array<Price>(...this.buy.keys()).sort((a, b) => a - b).slice(0, this.limit);
-    const askLevels = Array<Price>(...this.sell.keys()).sort((a, b) => a - b).slice(0, this.limit);
+    const bidLevels = toArray(this.buy).slice(0, this.limit);
+    const askLevels = toArray(this.sell).slice(0, this.limit);
 
     for (const level of bidLevels) {
       out += `B ${(level / 1e4).toFixed(2)}: ${this.buy.get(level)}\n`
@@ -63,11 +68,11 @@ export class SimpleOrderBook {
     return out;
   }
 
-
-  // /**
-  //  * @returns bid-ask spread
-  //  */
-  // getSpread() {
-  //   return [this.buy[0].price, this.sell[0].price];
-  // }
+  /**
+   * @returns bid-ask spread
+   */
+  getSpread(): Price[] {
+    const totalBids = this.buy.size;
+    return [toArray(this.buy)[totalBids - 1], toArray(this.sell)[0]];
+  }
 }

@@ -1,22 +1,6 @@
 import { SimpleOrderBook } from './simple';
 import { Order } from '../order';
 
-const makeOrder = (
-  stock: string,
-  locate: number,
-  price: number,
-  shares: number,
-  reference: string,
-  side: string
-): Order => ({
-  stock,
-  locate,
-  price,
-  shares,
-  reference,
-  side,
-});
-
 const makeBook = (limit?: number) => {
   const book = new SimpleOrderBook(limit);
   book.add('S', 10000, 500);
@@ -48,14 +32,14 @@ describe('constructor()', () => {
   });
 });
 
-// describe('getSpread()', () => {
-//   it('works', () => {
-//     const book = makeBook(1);
-//     const [bid, ask] = book.getSpread();
-//     expect(bid).toBe(10000);
-//     expect(ask).toBe(10200);
-//   });
-// });
+describe('getSpread()', () => {
+  it('works', () => {
+    const book = makeBook(1);
+    const [bid, ask] = book.getSpread();
+    expect(bid).toBe(9900);
+    expect(ask).toBe(10000);
+  });
+});
 
 describe('toString()', () => {
   it('basic', () => {
