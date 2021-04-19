@@ -1,8 +1,7 @@
-import { SimpleOrderBook } from '.';
-import { Order } from '../order';
+import { OrderBook } from '.';
 
 const makeBook = (limit?: number) => {
-  const book = new SimpleOrderBook(limit);
+  const book = new OrderBook(limit);
   book.add('S', 10000, 500);
   book.add('S', 10000, 1000);
   book.add('S', 10500, 2000);

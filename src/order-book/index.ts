@@ -32,9 +32,6 @@ export class OrderBook {
   add(side: Side, price: Price, volume: Shares) {
     const container = (side === 'S') ? this.sell : this.buy;
     const current = container.get(price) || 0;
-    if (price === 3447000) {
-      console.log('add %s %s', price, volume)
-    }
     container.set(price, current + volume);
   }
 
@@ -46,9 +43,6 @@ export class OrderBook {
    * @param volume
    */
   remove(side: Side, price: Price, volume: Shares) {
-    if (price === 3447000) {
-      console.log('rem %s %s', price, volume)
-    }
     const container = (side === 'S') ? this.sell : this.buy;
     const current = container.get(price) || 0;
     assert(current >= volume, `Cannot remove more ${volume} volume than ${current} total at this level ${price}`)
