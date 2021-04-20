@@ -18,10 +18,12 @@ export default (fd: number) => {
     pageOffset = 0;
     page = Buffer.alloc(PAGE_SIZE);
     fs.readSync(fd, page, 0, PAGE_SIZE, offset);
-  }
+  };
 
   const iterator: IterableIterator<Buffer> = {
-    [Symbol.iterator]: function () { return this; },
+    [Symbol.iterator]: function () {
+      return this;
+    },
     next: () => {
       if (!page) readPage();
 
@@ -31,7 +33,7 @@ export default (fd: number) => {
 
       size = page.readUInt16BE(pageOffset);
       if (pageOffset + 2 + size > page.length) {
-        readPage()
+        readPage();
       }
 
       // TODO: do not copy?
@@ -39,8 +41,8 @@ export default (fd: number) => {
       offset = offset + 2 + size;
       pageOffset = pageOffset + 2 + size;
 
-      return { value, done: offset === totalSize }
-    }
+      return { value, done: offset === totalSize };
+    },
   };
 
   return iterator;

@@ -1,4 +1,4 @@
-import assert from 'assert'
+import assert from 'assert';
 import { Order } from '../order';
 
 type Locates = Map<number, string>;

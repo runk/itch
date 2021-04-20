@@ -105,7 +105,7 @@ export default (pool: Pool, book: OrderBook) => {
         book.remove(order.side, order.price, msg.shares);
 
         // console.log(msg.toString(), msg)
-        console.log(book.getSpread())
+        console.log(book.getSpread());
         break;
 
       case MessageType.OrderExecuted:
@@ -120,7 +120,7 @@ export default (pool: Pool, book: OrderBook) => {
         book.remove(order.side, order.price, msg.shares);
 
         // console.log(msg.toString(), msg)
-        console.log(book.getSpread())
+        console.log(book.getSpread());
         break;
     }
   };

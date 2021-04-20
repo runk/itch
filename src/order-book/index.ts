@@ -4,10 +4,9 @@ import { Side } from '../order';
 type Shares = number;
 type Price = number;
 
-
 const toArray = (map: Map<Price, Shares>): Price[] => {
   return Array<Price>(...map.keys()).sort((a, b) => a - b);
-}
+};
 
 export class OrderBook {
   limit?: number;
@@ -30,7 +29,7 @@ export class OrderBook {
    * @param volume
    */
   add(side: Side, price: Price, volume: Shares) {
-    const container = (side === 'S') ? this.sell : this.buy;
+    const container = side === 'S' ? this.sell : this.buy;
     const current = container.get(price) || 0;
     container.set(price, current + volume);
   }
@@ -43,9 +42,12 @@ export class OrderBook {
    * @param volume
    */
   remove(side: Side, price: Price, volume: Shares) {
-    const container = (side === 'S') ? this.sell : this.buy;
+    const container = side === 'S' ? this.sell : this.buy;
     const current = container.get(price) || 0;
-    assert(current >= volume, `Cannot remove more ${volume} volume than ${current} total at this level ${price}`)
+    assert(
+      current >= volume,
+      `Cannot remove more ${volume} volume than ${current} total at this level ${price}`
+    );
 
     if (volume === current) {
       container.delete(price);
@@ -60,11 +62,11 @@ export class OrderBook {
     const askLevels = toArray(this.sell).slice(0, this.limit);
 
     for (const level of bidLevels) {
-      out += `B ${(level / 1e4).toFixed(2)}: ${this.buy.get(level)}\n`
+      out += `B ${(level / 1e4).toFixed(2)}: ${this.buy.get(level)}\n`;
     }
     out += '-----\n';
     for (const level of askLevels) {
-      out += `S ${(level / 1e4).toFixed(2)}: ${this.sell.get(level)}\n`
+      out += `S ${(level / 1e4).toFixed(2)}: ${this.sell.get(level)}\n`;
     }
     return out;
   }
