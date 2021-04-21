@@ -2,15 +2,15 @@
   "name": "itch",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "test": "jest",
     "format": "prettier --write .",
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/local.ts"
   },
   "author": "",
   "license": "ISC",
+  "main": "lib/index.js",
   "devDependencies": {
     "@types/jest": "^26.0.22",
     "@types/node": "^14.14.7",
