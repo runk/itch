@@ -2,126 +2,112 @@ import assert from 'assert';
 import Pool from './pool';
 import { OrderBook } from './order-book';
 import {
-  getLocate,
-  getTimestampHuman,
+  Message,
   MessageAddOrder,
+  MessageAddOrderWithAttribution,
   MessageOrderCancel,
   MessageOrderDelete,
   MessageOrderExecuted,
   MessageOrderExecutedWithPrice,
   MessageOrderReplace,
   MessageStockDirectory,
-} from './parser';
-import { MessageType } from './types';
-import { Order, Side } from './order';
+} from './parser/msg';
+import { Order } from './order';
 
 export default (pool: Pool, book: OrderBook) => {
-  const onMessage = (type: MessageType, buf: Buffer) => {
-    // Listen for AAPL only
-    if (getLocate(buf) != 13) return;
-    // if (getTimestampHuman(buf) < '09:40') return;
-    if (getTimestampHuman(buf) > '09:35') {
-      console.log('hard stop');
-      process.exit(1);
+  const onMessage = (msg: Message) => {
+    // console.log(msg.toString(), msg);
+
+    // let msg;
+    let order: Order | undefined;
+    if (msg instanceof MessageStockDirectory) {
+      pool.stockRegister(msg.locate, msg.stock);
+      return;
     }
 
-    let msg;
-    let order: Order | undefined;
-    switch (type) {
-      case MessageType.StockDirectory:
-        msg = new MessageStockDirectory(buf);
+    if (
+      msg instanceof MessageAddOrder ||
+      msg instanceof MessageAddOrderWithAttribution
+    ) {
+      order = {
+        stock: msg.stock,
+        locate: msg.locate,
+        price: msg.price,
+        shares: msg.shares,
+        reference: msg.reference,
+        side: msg.side,
+      };
+      pool.add(order);
+      book.add(msg.side, msg.price, msg.shares);
+      return;
+    }
 
-        console.log(msg.toString(), msg);
-        pool.stockRegister(msg.locate, msg.stock);
-        break;
+    if (msg instanceof MessageOrderDelete) {
+      order = pool.get(msg.reference);
+      assert(order, 'Order not found');
 
-      case MessageType.AddOrder:
-      case MessageType.AddOrderWithAttribution:
-        msg = new MessageAddOrder(buf);
-        // console.log(msg.toString(), msg)
-        order = {
-          stock: msg.stock,
-          locate: msg.locate,
-          price: msg.price,
-          shares: msg.shares,
-          reference: msg.reference,
-          side: msg.side,
-        };
-        pool.add(order);
-        book.add(msg.side, msg.price, msg.shares);
-        break;
+      pool.delete(msg.reference);
+      book.remove(order.side, order.price, order.shares);
+      return;
+    }
 
-      case MessageType.OrderDelete:
-        msg = new MessageOrderDelete(buf);
-        // console.log(msg.toString(), msg)
-        order = pool.get(msg.reference);
-        assert(order, 'Order not found');
+    if (msg instanceof MessageOrderCancel) {
+      order = pool.get(msg.reference);
+      assert(order, 'Order not found');
 
-        pool.delete(msg.reference);
-        book.remove(order.side, order.price, order.shares);
-        break;
+      pool.modify(msg.reference, msg.shares);
+      book.remove(order.side, order.price, msg.shares);
+      return;
+    }
 
-      case MessageType.OrderCancel:
-        msg = new MessageOrderCancel(buf);
-        // console.log(msg.toString(), msg)
-        order = pool.get(msg.reference);
-        assert(order, 'Order not found');
+    if (msg instanceof MessageOrderReplace) {
+      order = pool.get(msg.reference);
+      if (!order) {
+        throw new Error('Order not found');
+      }
 
-        pool.modify(msg.reference, msg.shares);
-        book.remove(order.side, order.price, msg.shares);
-        break;
+      // console.log(msg.toString(), msg)
+      pool.delete(msg.reference);
+      pool.add({
+        stock: order.stock,
+        locate: msg.locate,
+        price: msg.price,
+        shares: msg.shares,
+        reference: msg.referenceNew,
+        side: order.side,
+      });
 
-      case MessageType.OrderReplace:
-        msg = new MessageOrderReplace(buf);
-        order = pool.get(msg.reference);
-        if (!order) {
-          throw new Error('Order not found');
-        }
+      book.remove(order.side, order.price, order.shares);
+      book.add(order.side, msg.price, msg.shares);
+      return;
+    }
 
-        // console.log(msg.toString(), msg)
-        pool.delete(msg.reference);
-        pool.add({
-          stock: order.stock,
-          locate: msg.locate,
-          price: msg.price,
-          shares: msg.shares,
-          reference: msg.referenceNew,
-          side: order.side,
-        });
+    if (msg instanceof MessageOrderExecutedWithPrice) {
+      order = pool.get(msg.reference);
+      assert(order, 'Order not found');
 
-        book.remove(order.side, order.price, order.shares);
-        book.add(order.side, msg.price, msg.shares);
-        break;
+      console.log(msg.toString(), order!.price / 1e4, order?.side);
 
-      case MessageType.OrderExecutedWithPrice:
-        msg = new MessageOrderExecutedWithPrice(buf);
+      pool.modify(msg.reference, msg.shares);
+      book.remove(order.side, order.price, msg.shares);
 
-        order = pool.get(msg.reference);
-        assert(order, 'Order not found');
+      // console.log(msg.toString(), msg)
+      console.log(book.getSpread());
+      return;
+    }
 
-        console.log(msg.toString(), order!.price / 1e4, order?.side);
+    if (msg instanceof MessageOrderExecuted) {
+      order = pool.get(msg.reference);
+      assert(order, 'Order not found');
 
-        pool.modify(msg.reference, msg.shares);
-        book.remove(order.side, order.price, msg.shares);
+      console.log(msg.toString(), order!.price / 1e4, order?.side);
 
-        // console.log(msg.toString(), msg)
-        console.log(book.getSpread());
-        break;
+      pool.modify(msg.reference, msg.shares);
+      book.remove(order.side, order.price, msg.shares);
 
-      case MessageType.OrderExecuted:
-        msg = new MessageOrderExecuted(buf);
-
-        order = pool.get(msg.reference);
-        assert(order, 'Order not found');
-
-        console.log(msg.toString(), order!.price / 1e4, order?.side);
-
-        pool.modify(msg.reference, msg.shares);
-        book.remove(order.side, order.price, msg.shares);
-
-        // console.log(msg.toString(), msg)
-        console.log(book.getSpread());
-        break;
+      // console.log(msg.toString(), msg)
+      console.log(book.getSpread());
+      return;
     }
   };
 

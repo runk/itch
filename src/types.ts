@@ -20,22 +20,3 @@ export enum MessageType {
   TradeCross = 'Q',
   TradeNonCross = 'P',
 }
-
-export type MessageHeader = {
-  type: MessageType;
-  locate: number;
-  tracking: number;
-  timestamp: number;
-};
-
-// export interface MessageBody =
-//   reference?: string;
-//   price?: number;
-//   shares?: number;
-//   [key: string]: string | number;
-// }
-
-export interface Message<T = unknown> {
-  header: MessageHeader;
-  body: T;
-}
