@@ -13,10 +13,6 @@ export default class Pool {
   }
 
   stockRegister(locate: number, stock: string) {
-    // if (stock.startsWith('AAPL')) {
-    //   console.log(locate)
-    //   process.exit(1)
-    // }
     this.locates.set(locate, stock);
   }
 
@@ -26,7 +22,6 @@ export default class Pool {
 
   add(order: Order) {
     this.store.set(order.reference, order);
-    // if (this.store.size % 1e3 == 0) console.log('>>>', this.store.size);
     return order;
   }
 

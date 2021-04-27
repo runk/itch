@@ -39,7 +39,7 @@ export default (source: string, onMessage: OnMessageFn) => {
       // TODO: use int8
       const type = buf.toString('latin1', offset + 2, offset + 3);
 
-      // TODO: do not copy
+      // TODO: do not copy - use pointers
       const message = buf.slice(offset + 2, offset + 3 + size - 1);
 
       // const msg = parse(type, message)

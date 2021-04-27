@@ -9,13 +9,13 @@ const toArray = (map: Map<Price, Shares>): Price[] => {
 };
 
 export class OrderBook {
-  limit?: number;
+  depth?: number;
 
   buy: Map<Price, Shares>;
   sell: Map<Price, Shares>;
 
-  constructor(limit?: number) {
-    this.limit = limit;
+  constructor(depth?: number) {
+    this.depth = depth;
 
     this.buy = new Map<Price, Shares>();
     this.sell = new Map<Price, Shares>();
@@ -58,8 +58,8 @@ export class OrderBook {
 
   toString() {
     let out = '';
-    const bidLevels = toArray(this.buy).slice(0, this.limit);
-    const askLevels = toArray(this.sell).slice(0, this.limit);
+    const bidLevels = toArray(this.buy).slice(0, this.depth);
+    const askLevels = toArray(this.sell).slice(0, this.depth);
 
     for (const level of bidLevels) {
       out += `B ${(level / 1e4).toFixed(2)}: ${this.buy.get(level)}\n`;
@@ -76,6 +76,7 @@ export class OrderBook {
    */
   getSpread(): Price[] {
     const totalBids = this.buy.size;
+    // TODO: make it fast
     return [toArray(this.buy)[totalBids - 1], toArray(this.sell)[0]];
   }
 }

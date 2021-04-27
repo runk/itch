@@ -35,6 +35,6 @@ export default (buf: Buffer) => {
       return new MessageOrderExecuted(buf);
   }
 
-  console.log('unhandled type', type)
+  // console.log('unhandled type', type)
   return null;
 };

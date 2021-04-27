@@ -14,9 +14,8 @@ import {
 } from './parser/msg';
 import { Order } from './order';
 
-export default (pool: Pool, book: OrderBook) => {
-  const onMessage = (msg: Message) => {
-    // console.log(msg.toString(), msg);
+export default (pool: Pool, book: OrderBook) =>
+  (msg: Message) => {
 
     let order: Order | undefined;
     if (msg instanceof MessageStockDirectory) {
@@ -65,7 +64,6 @@ export default (pool: Pool, book: OrderBook) => {
         throw new Error('Order not found');
       }
 
-      // console.log(msg.toString(), msg)
       pool.delete(msg.reference);
       pool.add({
         stock: order.stock,
@@ -85,14 +83,9 @@ export default (pool: Pool, book: OrderBook) => {
       order = pool.get(msg.reference);
       assert(order, 'Order not found');
 
-      console.log(msg.toString(), order!.price / 1e4, order?.side);
-
       pool.modify(msg.reference, msg.shares);
-      // Which price to use?
-      book.remove(order.side, msg.price, msg.shares);
-
-      // console.log(msg.toString(), msg)
-      console.log(book.getSpread());
+      // what price to use?
+      book.remove(order.side, order.price, msg.shares);
       return;
     }
 
@@ -100,16 +93,8 @@ export default (pool: Pool, book: OrderBook) => {
       order = pool.get(msg.reference);
       assert(order, 'Order not found');
 
-      console.log(msg.toString(), order!.price / 1e4, order?.side);
-
       pool.modify(msg.reference, msg.shares);
       book.remove(order.side, order.price, msg.shares);
-
-      // console.log(msg.toString(), msg)
-      console.log(book.getSpread());
       return;
     }
   };
-
-  return onMessage;
-};
