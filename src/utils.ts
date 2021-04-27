@@ -1,13 +1,14 @@
 export const timestampToTime = (ts: number, precision = 9) => {
-  const rough_seconds = ts / 1e9;
-  var sec_num = Math.floor(rough_seconds);
-  var hours = Math.floor(sec_num / 3600);
-  var minutes = Math.floor((sec_num - hours * 3600) / 60);
-  var seconds = sec_num - hours * 3600 - minutes * 60;
+  const roughSeconds = ts / 1e9;
+  const numSeconds = Math.floor(roughSeconds);
 
-  const precisionFactor = Math.pow(10, precision);
-  let fraction = rough_seconds - sec_num;
-  fraction = Math.round(fraction * precisionFactor) / precisionFactor;
+  const hours = Math.floor(numSeconds / 3600);
+  const minutes = Math.floor((numSeconds - hours * 3600) / 60);
+  const seconds = numSeconds - hours * 3600 - minutes * 60;
+
+  const precisionMultiplier = Math.pow(10, precision);
+  let fraction = roughSeconds - numSeconds;
+  fraction = Math.round(fraction * precisionMultiplier) / precisionMultiplier;
 
   return (
     String(hours).padStart(2, '0') +

@@ -1,5 +1,5 @@
 import { Side } from '../order';
-import { MessageType } from '../types';
+import { MessageType } from './types';
 import { timestampToTime } from '../utils';
 
 export const getLocate = (buf: Buffer) => buf.readUInt16BE(1);

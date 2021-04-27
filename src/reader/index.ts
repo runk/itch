@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { MessageType } from '../types';
+import { MessageType } from '../parser/types';
 
 type OnMessageFn = (type: MessageType, msg: Buffer) => void;
 
