@@ -1,3 +1,46 @@
 #!/usr/bin/env node
+const package = require('../package.json');
+const fs = require('fs');
+const createIterator = require('../lib/reader/iterable').default;
+const parse = require('../lib/parser').default;
 
-console.log('hi')
+const { program } = require('commander');
+program.version(package.version);
+
+program
+  .requiredOption('-f, --file <string>', 'Input file with ITCH data feed')
+  .option(
+    '-t, --type <string>',
+    'Filter by a specific message type, e.g. "R" or "A"'
+  )
+  .option('-l, --locate <number>', 'Filter by a specific locate', parseInt)
+  .option('-n, --head <number>', 'Number of output messages', parseInt);
+
+program.parse(process.argv);
+const options = program.opts();
+console.log(options);
+
+const fd = fs.openSync(options.file, 'r');
+const read = createIterator(fd);
+
+let seq = 0;
+let msg;
+for (const buf of read) {
+  if (options.head !== undefined && seq > options.head) {
+    process.exit(0);
+  }
+
+  msg = parse(buf);
+  if (msg === null) continue;
+
+  if (options.type !== undefined && msg.type !== options.type) {
+    continue;
+  }
+
+  if (options.locate !== undefined && msg.locate !== options.locate) {
+    continue;
+  }
+
+  console.log(JSON.stringify(msg));
+  seq++;
+}

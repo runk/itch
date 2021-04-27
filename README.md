@@ -1,7 +1,4 @@
-# itch
-
-## Nasdaq ITCH data feed parser and tools
-
+# Nasdaq ITCH data feed parser and tools
 
 
 ## Reference
