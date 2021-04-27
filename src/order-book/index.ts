@@ -5,7 +5,7 @@ type Shares = number;
 type Price = number;
 
 const toArray = (map: Map<Price, Shares>): Price[] => {
-  return Array<Price>(...map.keys()).sort((a, b) => a - b);
+  return Array<Price>(...map.keys()).sort((a, b) => a > b ? 1 : -1);
 };
 
 export class OrderBook {
@@ -52,7 +52,7 @@ export class OrderBook {
     if (volume === current) {
       container.delete(price);
     } else {
-      this.sell.set(price, current - volume);
+      container.set(price, current - volume);
     }
   }
 

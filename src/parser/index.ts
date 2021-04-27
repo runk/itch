@@ -9,17 +9,7 @@ import {
   MessageStockDirectory,
 } from './msg';
 
-export default (
-  buf: Buffer
-):
-  | MessageAddOrder
-  | MessageOrderCancel
-  | MessageOrderDelete
-  | MessageOrderExecuted
-  | MessageOrderExecutedWithPrice
-  | MessageOrderReplace
-  | MessageStockDirectory
-  | null => {
+export default (buf: Buffer) => {
   const type = buf.toString('latin1', 0, 1);
   switch (type) {
     case MessageType.StockDirectory:
@@ -44,5 +34,7 @@ export default (
     case MessageType.OrderExecuted:
       return new MessageOrderExecuted(buf);
   }
+
+  console.log('unhandled type', type)
   return null;
 };
