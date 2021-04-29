@@ -22,8 +22,9 @@ export class Message {
   }
 
   toString() {
-    return `${timestampToTime(this.timestamp)}  ${this.constructor.name} ${this.locate
-      }`;
+    return `${timestampToTime(this.timestamp)}  ${this.constructor.name} ${
+      this.locate
+    }`;
   }
 }
 

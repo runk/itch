@@ -5,7 +5,7 @@ type Shares = number;
 type Price = number;
 
 const toArray = (map: Map<Price, Shares>): Price[] => {
-  return Array<Price>(...map.keys()).sort((a, b) => a > b ? 1 : -1);
+  return Array<Price>(...map.keys()).sort((a, b) => (a > b ? 1 : -1));
 };
 
 export class OrderBook {
