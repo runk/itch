@@ -2,7 +2,7 @@
 
 ## Data
 
-Sample data is availabe for free download via [ftp://emi.nasdaq.com/ITCH/](ftp://emi.nasdaq.com/ITCH/).
+Sample data is availabe for free download via (ftp://emi.nasdaq.com/ITCH/)[ftp://emi.nasdaq.com/ITCH/].
 
 ## Command line tool
 
