@@ -3,13 +3,7 @@ import { MessageType } from '../parser/types';
 
 type OnMessageFn = (type: MessageType, msg: Buffer) => void;
 
-// @ts-ignore
-const debug = (msg: string) => {
-  // console.log('reader: %s', msg);
-};
-
 export default (source: string, onMessage: OnMessageFn) => {
-  // const stream = fs.createReadStream(source, { start: 0, end: 10 * 7000000 });
   const stream = fs.createReadStream(source);
   let leftover: Buffer | undefined;
   let seq = 0;
@@ -17,8 +11,6 @@ export default (source: string, onMessage: OnMessageFn) => {
     const buf =
       leftover !== undefined ? Buffer.concat([leftover, chunk]) : chunk;
 
-    // console.log('> chunk', chunk.length)
-    // console.log('> leftover', leftover?.length ?? 0)
     leftover = undefined;
 
     let offset = 0;
@@ -42,21 +34,9 @@ export default (source: string, onMessage: OnMessageFn) => {
       // TODO: do not copy - use pointers
       const message = buf.slice(offset + 2, offset + 3 + size - 1);
 
-      // const msg = parse(type, message)
       onMessage(type as MessageType, message);
-
-      if (seq % 1e6 == 0) debug(`seq: ${seq}`);
 
       offset = offset + 2 + size;
     } while (offset < buf.length);
-
-    // if (seq > 20 * 1e6) {
-    //   console.log("Hard stop")
-    //   process.kill(1)
-    // }
-  });
-
-  stream.on('end', () => {
-    debug('stream end');
   });
 };
