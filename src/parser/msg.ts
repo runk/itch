@@ -2,6 +2,7 @@ import { Side } from '../order';
 import { MessageType } from './types';
 import { timestampToTime } from '../utils';
 
+export const getType = (buf: Buffer) => buf.toString('latin1', 0, 1);
 export const getLocate = (buf: Buffer) => buf.readUInt16BE(1);
 export const getTimestamp = (buf: Buffer) =>
   parseInt(buf.toString('hex', 5, 11), 16);
@@ -21,9 +22,8 @@ export class Message {
   }
 
   toString() {
-    return `${timestampToTime(this.timestamp)}  ${this.constructor.name} ${
-      this.locate
-    }`;
+    return `${timestampToTime(this.timestamp)}  ${this.constructor.name} ${this.locate
+      }`;
   }
 }
 

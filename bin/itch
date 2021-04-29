@@ -1,8 +1,10 @@
 #!/usr/bin/env node
+
 const package = require('../package.json');
 const fs = require('fs');
 const createIterator = require('../lib/reader/iterable').default;
 const parse = require('../lib/parser').default;
+const { getLocate, getType } = require('../lib/parser/msg');
 
 const { program } = require('commander');
 program.version(package.version);
@@ -13,12 +15,12 @@ program
     '-t, --type <string>',
     'Filter by a specific message type, e.g. "R" or "A"'
   )
+  .option('-b, --binary', 'Raw data (binary) output')
   .option('-l, --locate <number>', 'Filter by a specific locate', parseInt)
   .option('-n, --head <number>', 'Number of output messages', parseInt);
 
 program.parse(process.argv);
 const options = program.opts();
-console.log(options);
 
 const fd = fs.openSync(options.file, 'r');
 const read = createIterator(fd);
@@ -30,17 +32,25 @@ for (const buf of read) {
     process.exit(0);
   }
 
-  msg = parse(buf);
-  if (msg === null) continue;
-
-  if (options.type !== undefined && msg.type !== options.type) {
+  if (options.locate !== undefined && getLocate(buf) !== options.locate) {
     continue;
   }
 
-  if (options.locate !== undefined && msg.locate !== options.locate) {
+  if (options.type !== undefined && getType(buf) !== options.type) {
     continue;
   }
 
-  console.log(JSON.stringify(msg));
+  if (options.binary) {
+    const size = Buffer.alloc(2);
+    size.writeUInt16BE(buf.length);
+    process.stdout.write(size);
+    process.stdout.write(buf);
+  } else {
+    msg = parse(buf);
+    // Not all message types supported yet
+    if (msg === null) continue;
+    console.log(JSON.stringify(msg));
+  }
+
   seq++;
 }

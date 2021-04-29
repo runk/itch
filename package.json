@@ -2,6 +2,9 @@
   "name": "itch.js",
   "version": "1.0.0",
   "description": "",
+  "bin": {
+    "itch": "./bin/itch"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest",
