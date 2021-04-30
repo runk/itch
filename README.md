@@ -6,7 +6,7 @@ Sample data is availabe for free download from ftp://emi.nasdaq.com/ITCH/
 
 ## Command line tool
 
-The tool can help with following:
+Features:
 
 - Repackaging the bigger data file into smaller sets
 - Filter by message type
@@ -19,7 +19,7 @@ The tool can help with following:
 To get first 100 messages of locate 13 (AAPL - Apple) in json format:
 
 ```shell
-npx itch -f ~/Downloads/01302020.NASDAQ_ITCH50 -n 100 -l 13
+npx itch.js -f ~/Downloads/01302020.NASDAQ_ITCH50 -n 100 -l 13
 ```
 
 ```
