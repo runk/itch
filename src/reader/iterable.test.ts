@@ -6,10 +6,8 @@ let reader: IterableIterator<Buffer>;
 let fd: number;
 
 beforeEach(() => {
-  fd = fs.openSync(
-    path.resolve(__dirname, '../../test/locate-13-10k.bin'),
-    'r'
-  );
+  const feed = path.resolve(__dirname, '../../test/locate-13-10k.bin')
+  fd = fs.openSync(feed, 'r');
   reader = createIterator(fd);
 });
 afterEach((done) => fs.close(fd, done));
@@ -93,4 +91,15 @@ test('supports `next()` iteration style', () => {
     msgs.push(msg.value.toString('hex'));
   }
   expect(msgs).toEqual(expected);
+});
+
+test('can detect the end of stream', () => {
+  let done = false;
+  let n = 0;
+  while (!done) {
+    done = reader.next().done!;
+    n++;
+  }
+
+  expect(n).toBe(10000);
 });

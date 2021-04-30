@@ -1,6 +1,6 @@
 import assert from 'assert';
 import Pool from './pool';
-import { OrderBook } from './order-book';
+import OrderBook from './order-book';
 import {
   Message,
   MessageAddOrder,

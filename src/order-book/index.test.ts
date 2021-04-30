@@ -1,4 +1,4 @@
-import { OrderBook } from '.';
+import OrderBook from '.';
 
 const makeBook = (limit?: number) => {
   const book = new OrderBook(limit);

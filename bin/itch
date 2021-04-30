@@ -28,7 +28,7 @@ const read = createIterator(fd);
 let seq = 0;
 let msg;
 for (const buf of read) {
-  if (options.head !== undefined && seq > options.head) {
+  if (options.head !== undefined && seq >= options.head) {
     process.exit(0);
   }
 
