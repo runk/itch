@@ -6,7 +6,7 @@ let reader: IterableIterator<Buffer>;
 let fd: number;
 
 beforeEach(() => {
-  const feed = path.resolve(__dirname, '../../test/locate-13-10k.bin')
+  const feed = path.resolve(__dirname, '../../test/locate-13-10k.bin');
   fd = fs.openSync(feed, 'r');
   reader = createIterator(fd);
 });
