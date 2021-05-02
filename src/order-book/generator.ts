@@ -1,12 +1,12 @@
 import Pool from '../pool';
 
-interface Level {
+export interface Level {
   price: number;
   shares: number;
   orders: number;
 }
 
-export default (pool: Pool): string => {
+export default (pool: Pool, depth = 10): { bids: Level[]; asks: Level[] } => {
   const bids: Level[] = [];
   const asks: Level[] = [];
   let level;
@@ -32,20 +32,12 @@ export default (pool: Pool): string => {
     }
   });
 
-  let out = '';
-  asks.sort((a, b) => (a.price > b.price ? 1 : -1));
-  bids.sort((a, b) => (a.price > b.price ? 1 : -1));
+  // TODO: do as part of the loop?
+  asks.sort((a, b) => (a.price > b.price ? 1 : -1)).splice(depth);
+  bids.sort((a, b) => (a.price > b.price ? -1 : 1)).splice(depth);
 
-  for (level of bids) {
-    out += `B ${(level.price / 1e4).toFixed(2)}: ${level.shares} (${
-      level.orders
-    })\n`;
-  }
-  out += '-----\n';
-  for (level of asks) {
-    out += `S ${(level.price / 1e4).toFixed(2)}: ${level.shares} (${
-      level.orders
-    })\n`;
-  }
-  return out;
+  return {
+    bids,
+    asks,
+  };
 };
