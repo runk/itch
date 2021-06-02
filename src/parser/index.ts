@@ -1,38 +1,41 @@
 import { MessageType } from './types';
 import {
-  MessageAddOrder,
-  MessageOrderCancel,
-  MessageOrderDelete,
-  MessageOrderExecuted,
-  MessageOrderExecutedWithPrice,
-  MessageOrderReplace,
-  MessageStockDirectory,
+  parseAddOrderMessage,
+  parseAddOrderWithAttribution,
+  parseOrderDelete,
+  parseOrderCancel,
+  parseStockDirectory,
+  parseOrderReplace,
+  parseOrderExecutedWithPrice,
+  parseOrderExecuted,
 } from './msg';
 
 export default (buf: Buffer) => {
   const type = buf.toString('latin1', 0, 1);
   switch (type) {
     case MessageType.StockDirectory:
-      return new MessageStockDirectory(buf);
+      return parseStockDirectory(buf);
 
     case MessageType.AddOrder:
+      return parseAddOrderMessage(buf);
+
     case MessageType.AddOrderWithAttribution:
-      return new MessageAddOrder(buf);
+      return parseAddOrderWithAttribution(buf);
 
     case MessageType.OrderDelete:
-      return new MessageOrderDelete(buf);
+      return parseOrderDelete(buf);
 
     case MessageType.OrderCancel:
-      return new MessageOrderCancel(buf);
+      return parseOrderCancel(buf);
 
     case MessageType.OrderReplace:
-      return new MessageOrderReplace(buf);
+      return parseOrderReplace(buf);
 
     case MessageType.OrderExecutedWithPrice:
-      return new MessageOrderExecutedWithPrice(buf);
+      return parseOrderExecutedWithPrice(buf);
 
     case MessageType.OrderExecuted:
-      return new MessageOrderExecuted(buf);
+      return parseOrderExecuted(buf);
   }
 
   // console.log('unhandled type', type)

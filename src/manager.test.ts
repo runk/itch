@@ -5,7 +5,6 @@ import createManager, { OrderManager } from './manager';
 import Pool from './pool';
 import OrderBook from './order-book';
 import parse from './parser';
-import { MessageAddOrder, MessageOrderDelete } from './parser/msg';
 
 let reader: IterableIterator<Buffer>;
 let fd: number;
@@ -100,49 +99,49 @@ test('builds pool and book', () => {
   expect(pool.store.size).toBe(80);
 });
 
-describe('message types', () => {
-  let pool: Pool;
-  let book: OrderBook;
-  let manager: OrderManager;
+// describe('message types', () => {
+//   let pool: Pool;
+//   let book: OrderBook;
+//   let manager: OrderManager;
 
-  beforeEach(() => {
-    pool = new Pool();
-    book = new OrderBook();
-    manager = createManager(pool, book);
-  });
+//   beforeEach(() => {
+//     pool = new Pool();
+//     book = new OrderBook();
+//     manager = createManager(pool, book);
+//   });
 
-  it('supports AddOrder message', () => {
-    const order = manager(
-      new MessageAddOrder(
-        Buffer.from(
-          '41000d00001790c194795e00000000002b8ef942000000644141504c202020200030fa48',
-          'hex'
-        )
-      )
-    );
-    expect(order).toEqual({
-      stock: 'AAPL    ',
-      locate: 13,
-      price: 3209800,
-      shares: 100,
-      reference: '00000000002b8ef9',
-      side: 'B',
-    });
-  });
+//   it('supports AddOrder message', () => {
+//     const order = manager(
+//       new MessageAddOrder(
+//         Buffer.from(
+//           '41000d00001790c194795e00000000002b8ef942000000644141504c202020200030fa48',
+//           'hex'
+//         )
+//       )
+//     );
+//     expect(order).toEqual({
+//       stock: 'AAPL    ',
+//       locate: 13,
+//       price: 3209800,
+//       shares: 100,
+//       reference: '00000000002b8ef9',
+//       side: 'B',
+//     });
+//   });
 
-  it.skip('supports OrderDelete message', () => {
-    const order = manager(
-      new MessageOrderDelete(
-        Buffer.from('44000d00001c0f75504eb2000000000059170d', 'hex')
-      )
-    );
-    expect(order).toEqual({
-      stock: 'AAPL    ',
-      locate: 13,
-      price: 3209800,
-      shares: 100,
-      reference: '00000000002b8ef9',
-      side: 'B',
-    });
-  });
-});
+//   it.skip('supports OrderDelete message', () => {
+//     const order = manager(
+//       new MessageOrderDelete(
+//         Buffer.from('44000d00001c0f75504eb2000000000059170d', 'hex')
+//       )
+//     );
+//     expect(order).toEqual({
+//       stock: 'AAPL    ',
+//       locate: 13,
+//       price: 3209800,
+//       shares: 100,
+//       reference: '00000000002b8ef9',
+//       side: 'B',
+//     });
+//   });
+// });

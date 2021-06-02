@@ -1,18 +1,20 @@
 import assert from 'assert';
 import Pool from './pool';
 import OrderBook from './order-book';
+import { Order } from './order';
 import {
+  isType,
   Message,
   MessageAddOrder,
   MessageAddOrderWithAttribution,
   MessageOrderCancel,
-  MessageOrderDelete,
   MessageOrderExecuted,
   MessageOrderExecutedWithPrice,
   MessageOrderReplace,
   MessageStockDirectory,
-} from './parser/msg';
-import { Order } from './order';
+  MessageType,
+} from './parser/types';
+import { MessageOrderDelete } from './parser/msg';
 
 export interface OrderManager {
   (msg: Message): Order | null;
@@ -22,14 +24,18 @@ const manager =
   (pool: Pool, book: OrderBook): OrderManager =>
   (msg: Message): Order | null => {
     let order: Order | undefined;
-    if (msg instanceof MessageStockDirectory) {
+
+    if (isType<MessageStockDirectory>(msg, MessageType.StockDirectory)) {
       pool.stockRegister(msg.locate, msg.stock);
       return null;
     }
 
     if (
-      msg instanceof MessageAddOrder ||
-      msg instanceof MessageAddOrderWithAttribution
+      isType<MessageAddOrder>(msg, MessageType.AddOrder) ||
+      isType<MessageAddOrderWithAttribution>(
+        msg,
+        MessageType.AddOrderWithAttribution
+      )
     ) {
       order = {
         stock: msg.stock,
@@ -44,7 +50,7 @@ const manager =
       return order;
     }
 
-    if (msg instanceof MessageOrderDelete) {
+    if (isType<MessageOrderDelete>(msg, MessageType.OrderDelete)) {
       order = pool.get(msg.reference);
       assert(order, 'Order not found');
 
@@ -53,7 +59,7 @@ const manager =
       return order;
     }
 
-    if (msg instanceof MessageOrderCancel) {
+    if (isType<MessageOrderCancel>(msg, MessageType.OrderCancel)) {
       order = pool.get(msg.reference);
       assert(order, 'Order not found');
 
@@ -62,7 +68,7 @@ const manager =
       return order;
     }
 
-    if (msg instanceof MessageOrderReplace) {
+    if (isType<MessageOrderReplace>(msg, MessageType.OrderReplace)) {
       order = pool.get(msg.reference);
       if (!order) {
         throw new Error('Order not found');
@@ -85,7 +91,12 @@ const manager =
       return newOrder;
     }
 
-    if (msg instanceof MessageOrderExecutedWithPrice) {
+    if (
+      isType<MessageOrderExecutedWithPrice>(
+        msg,
+        MessageType.OrderExecutedWithPrice
+      )
+    ) {
       order = pool.get(msg.reference);
       assert(order, 'Order not found');
 
@@ -95,7 +106,7 @@ const manager =
       return order;
     }
 
-    if (msg instanceof MessageOrderExecuted) {
+    if (isType<MessageOrderExecuted>(msg, MessageType.OrderExecuted)) {
       order = pool.get(msg.reference);
       assert(order, 'Order not found');
 

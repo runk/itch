@@ -43,7 +43,7 @@ export const parseAddOrderMessage: Parser<MessageAddOrder> = (buf: Buffer) => {
   };
 };
 
-export const parseAddOrderWithAttributionMessage: Parser<MessageAddOrderWithAttribution> =
+export const parseAddOrderWithAttribution: Parser<MessageAddOrderWithAttribution> =
   (buf: Buffer) => {
     return {
       ...parseAddOrderMessage(buf),
@@ -51,7 +51,7 @@ export const parseAddOrderWithAttributionMessage: Parser<MessageAddOrderWithAttr
     };
   };
 
-export const parseMessageSystem: Parser<MessageSystem> = (buf: Buffer) => {
+export const parseSystem: Parser<MessageSystem> = (buf: Buffer) => {
   return {
     ...parseBaseMessage(buf),
     type: MessageType.System,
@@ -59,7 +59,7 @@ export const parseMessageSystem: Parser<MessageSystem> = (buf: Buffer) => {
   };
 };
 
-export const parseMessageStockDirectory: Parser<MessageStockDirectory> = (
+export const parseStockDirectory: Parser<MessageStockDirectory> = (
   buf: Buffer
 ) => {
   return {
@@ -69,7 +69,7 @@ export const parseMessageStockDirectory: Parser<MessageStockDirectory> = (
   };
 };
 
-export const parseMessageOrderExecuted: Parser<MessageOrderExecuted> = (
+export const parseOrderExecuted: Parser<MessageOrderExecuted> = (
   buf: Buffer
 ) => {
   return {
@@ -81,7 +81,7 @@ export const parseMessageOrderExecuted: Parser<MessageOrderExecuted> = (
   };
 };
 
-export const parseMessageOrderExecutedWithPrice: Parser<MessageOrderExecutedWithPrice> =
+export const parseOrderExecutedWithPrice: Parser<MessageOrderExecutedWithPrice> =
   (buf: Buffer) => {
     return {
       ...parseBaseMessage(buf),
@@ -94,9 +94,7 @@ export const parseMessageOrderExecutedWithPrice: Parser<MessageOrderExecutedWith
     };
   };
 
-export const parseMessageOrderCancel: Parser<MessageOrderCancel> = (
-  buf: Buffer
-) => {
+export const parseOrderCancel: Parser<MessageOrderCancel> = (buf: Buffer) => {
   return {
     ...parseBaseMessage(buf),
     type: MessageType.OrderCancel,
@@ -110,9 +108,7 @@ export interface MessageOrderDelete extends Message {
   reference: string;
 }
 
-export const parseMessageOrderDelete: Parser<MessageOrderDelete> = (
-  buf: Buffer
-) => {
+export const parseOrderDelete: Parser<MessageOrderDelete> = (buf: Buffer) => {
   return {
     ...parseBaseMessage(buf),
     type: MessageType.OrderDelete,
@@ -120,9 +116,7 @@ export const parseMessageOrderDelete: Parser<MessageOrderDelete> = (
   };
 };
 
-export const parseMessageOrderReplace: Parser<MessageOrderReplace> = (
-  buf: Buffer
-) => {
+export const parseOrderReplace: Parser<MessageOrderReplace> = (buf: Buffer) => {
   return {
     ...parseBaseMessage(buf),
     type: MessageType.OrderReplace,

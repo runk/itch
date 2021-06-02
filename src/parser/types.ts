@@ -87,3 +87,11 @@ export interface MessageOrderCancel extends Message {
   reference: string;
   shares: number;
 }
+
+// TODO: is there a better way of doing it?
+export const isType = <T extends Message>(
+  msg: Message,
+  type: MessageType
+): msg is T => {
+  return msg.type === type;
+};
