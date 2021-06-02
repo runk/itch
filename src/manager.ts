@@ -14,11 +14,15 @@ import {
 } from './parser/msg';
 import { Order } from './order';
 
-export default (pool: Pool, book: OrderBook) => (msg: Message) => {
+export interface OrderManager {
+  (msg: Message): Order | null;
+}
+
+const manager = (pool: Pool, book: OrderBook): OrderManager => (msg: Message): Order | null => {
   let order: Order | undefined;
   if (msg instanceof MessageStockDirectory) {
     pool.stockRegister(msg.locate, msg.stock);
-    return;
+    return null;
   }
 
   if (
@@ -35,7 +39,7 @@ export default (pool: Pool, book: OrderBook) => (msg: Message) => {
     };
     pool.add(order);
     book.add(msg.side, msg.price, msg.shares);
-    return;
+    return order;
   }
 
   if (msg instanceof MessageOrderDelete) {
@@ -44,7 +48,7 @@ export default (pool: Pool, book: OrderBook) => (msg: Message) => {
 
     pool.delete(msg.reference);
     book.remove(order.side, order.price, order.shares);
-    return;
+    return order;
   }
 
   if (msg instanceof MessageOrderCancel) {
@@ -53,7 +57,7 @@ export default (pool: Pool, book: OrderBook) => (msg: Message) => {
 
     pool.modify(msg.reference, msg.shares);
     book.remove(order.side, order.price, msg.shares);
-    return;
+    return order;
   }
 
   if (msg instanceof MessageOrderReplace) {
@@ -62,19 +66,21 @@ export default (pool: Pool, book: OrderBook) => (msg: Message) => {
       throw new Error('Order not found');
     }
 
-    pool.delete(msg.reference);
-    pool.add({
+    const newOrder: Order = {
       stock: order.stock,
       locate: msg.locate,
       price: msg.price,
       shares: msg.shares,
       reference: msg.referenceNew,
       side: order.side,
-    });
+    };
+
+    pool.delete(msg.reference);
+    pool.add(newOrder);
 
     book.remove(order.side, order.price, order.shares);
     book.add(order.side, msg.price, msg.shares);
-    return;
+    return newOrder;
   }
 
   if (msg instanceof MessageOrderExecutedWithPrice) {
@@ -84,7 +90,7 @@ export default (pool: Pool, book: OrderBook) => (msg: Message) => {
     pool.modify(msg.reference, msg.shares);
     // what price to use?
     book.remove(order.side, order.price, msg.shares);
-    return;
+    return order;
   }
 
   if (msg instanceof MessageOrderExecuted) {
@@ -93,6 +99,9 @@ export default (pool: Pool, book: OrderBook) => (msg: Message) => {
 
     pool.modify(msg.reference, msg.shares);
     book.remove(order.side, order.price, msg.shares);
-    return;
+    return order;
   }
+  return null;
 };
+
+export default manager;
