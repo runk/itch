@@ -22,7 +22,7 @@ export interface OrderManager {
 
 const manager =
   (pool: Pool, book: OrderBook): OrderManager =>
-  (msg: Message): Order | null => {
+  <T extends Message>(msg: T): Order | null => {
     let order: Order | undefined;
 
     if (isType<MessageStockDirectory>(msg, MessageType.StockDirectory)) {
