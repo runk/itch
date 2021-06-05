@@ -129,6 +129,7 @@ describe('message types', () => {
   const orderAdd: MessageAddOrder = {
     ...base,
     type: MessageType.AddOrder,
+    timestamp: 1,
     reference: 'abc',
     side: 'S',
     shares: 10,
@@ -138,12 +139,14 @@ describe('message types', () => {
   const orderDelete: MessageOrderDelete = {
     ...base,
     type: MessageType.OrderDelete,
+    timestamp: 2,
     reference: 'abc',
   };
 
   const orderCancel: MessageOrderCancel = {
     ...base,
     type: MessageType.OrderCancel,
+    timestamp: 3,
     shares: 1,
     reference: 'abc',
   };
@@ -151,6 +154,7 @@ describe('message types', () => {
   const orderReplace: MessageOrderReplace = {
     ...base,
     type: MessageType.OrderReplace,
+    timestamp: 4,
     reference: 'abc',
     referenceNew: 'def',
     shares: 50,
@@ -160,6 +164,7 @@ describe('message types', () => {
   const orderExecuted: MessageOrderExecuted = {
     ...base,
     type: MessageType.OrderExecuted,
+    timestamp: 5,
     reference: 'abc',
     shares: 2,
     match: 'match id',
@@ -168,6 +173,7 @@ describe('message types', () => {
   it('supports AddOrder', () => {
     const order = manager(orderAdd);
     const expected: Order = {
+      timestamp: 1,
       stock: 'XYZ',
       locate: 1,
       price: 10000,
@@ -183,6 +189,7 @@ describe('message types', () => {
     manager(orderAdd);
     const order = manager(orderDelete);
     expect(order).toEqual({
+      timestamp: 1,
       stock: 'XYZ',
       locate: 1,
       price: 10000,
@@ -197,6 +204,7 @@ describe('message types', () => {
     manager(orderAdd);
     const order = manager(orderCancel);
     const expected = {
+      timestamp: 1,
       stock: 'XYZ',
       locate: 1,
       price: 10000,
@@ -213,6 +221,7 @@ describe('message types', () => {
     const cancellation: MessageOrderCancel = { ...orderCancel, shares: 10 };
     const order = manager(cancellation);
     const expected = {
+      timestamp: 1,
       stock: 'XYZ',
       locate: 1,
       price: 10000,
@@ -228,6 +237,7 @@ describe('message types', () => {
     manager(orderAdd);
     const order = manager(orderReplace);
     const expected = {
+      timestamp: 4,
       stock: 'XYZ',
       locate: 1,
       price: 20000,
@@ -244,6 +254,7 @@ describe('message types', () => {
     manager(orderAdd);
     const order = manager(orderExecuted);
     const expected = {
+      timestamp: 1,
       stock: 'XYZ',
       locate: 1,
       price: 10000,
@@ -260,6 +271,7 @@ describe('message types', () => {
     const execution = { ...orderExecuted, shares: 10 };
     const order = manager(execution);
     const expected = {
+      timestamp: 1,
       stock: 'XYZ',
       locate: 1,
       price: 10000,

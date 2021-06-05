@@ -38,6 +38,7 @@ const manager =
       )
     ) {
       order = {
+        timestamp: msg.timestamp,
         stock: msg.stock,
         locate: msg.locate,
         price: msg.price,
@@ -75,6 +76,8 @@ const manager =
       }
 
       const newOrder: Order = {
+        // TODO: or original order's timestamp?
+        timestamp: msg.timestamp,
         stock: order.stock,
         locate: msg.locate,
         price: msg.price,
