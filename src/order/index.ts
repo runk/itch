@@ -7,6 +7,7 @@ export type Order = {
   shares: number;
   reference: string;
   side: Side;
+  timestamp: number;
 };
 
 export const orderToString = (order: Order) =>
