@@ -117,6 +117,7 @@ const manager =
       book.remove(order.side, order.price, msg.shares);
       return order;
     }
+
     return null;
   };
 

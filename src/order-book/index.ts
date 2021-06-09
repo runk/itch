@@ -8,14 +8,26 @@ const toArray = (map: Map<Price, Shares>): Price[] => {
   return Array<Price>(...map.keys()).sort((a, b) => (a > b ? 1 : -1));
 };
 
+const min = (arr: Map<Price, Shares>) => Math.min(...arr.keys());
+const max = (arr: Map<Price, Shares>) => Math.max(...arr.keys());
+
+const SIDE_BUY = 'B';
+const SIDE_SELL = 'S';
+
 export default class OrderBook {
   depth?: number;
 
   buy: Map<Price, Shares>;
   sell: Map<Price, Shares>;
 
+  bid: number;
+  ask: number;
+
   constructor(depth?: number) {
     this.depth = depth;
+
+    this.bid = -Infinity;
+    this.ask = Infinity;
 
     this.buy = new Map<Price, Shares>();
     this.sell = new Map<Price, Shares>();
@@ -29,7 +41,10 @@ export default class OrderBook {
    * @param volume
    */
   add(side: Side, price: Price, volume: Shares) {
-    const container = side === 'S' ? this.sell : this.buy;
+    if (side == SIDE_BUY) this.bid = Math.max(this.bid, price);
+    if (side == SIDE_SELL) this.ask = Math.min(this.ask, price);
+
+    const container = side === SIDE_SELL ? this.sell : this.buy;
     const current = container.get(price) || 0;
     container.set(price, current + volume);
   }
@@ -42,7 +57,7 @@ export default class OrderBook {
    * @param volume
    */
   remove(side: Side, price: Price, volume: Shares) {
-    const container = side === 'S' ? this.sell : this.buy;
+    const container = side === SIDE_SELL ? this.sell : this.buy;
     const current = container.get(price) || 0;
     assert(
       current >= volume,
@@ -53,6 +68,12 @@ export default class OrderBook {
       container.delete(price);
     } else {
       container.set(price, current - volume);
+    }
+
+    if (side == SIDE_BUY && price == this.bid) {
+      this.bid = max(this.buy);
+    } else if (side == SIDE_SELL && price == this.ask) {
+      this.ask = min(this.sell);
     }
   }
 
