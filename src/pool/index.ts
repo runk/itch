@@ -36,12 +36,13 @@ export default class Pool {
       throw new Error('No orders to modify');
     }
 
-    if (order.shares === executedShares) {
+    order.shares -= executedShares;
+
+    if (order.shares === 0) {
       this.delete(order.reference);
       return;
     }
 
-    order.shares -= executedShares;
     assert(order.shares > 0, 'Shares <= 0');
   }
 

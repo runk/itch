@@ -22,7 +22,7 @@ export interface OrderManager {
 
 const manager =
   (pool: Pool, book: OrderBook): OrderManager =>
-  (msg: Message): Order | null => {
+  <T extends Message>(msg: T): Order | null => {
     let order: Order | undefined;
 
     if (isType<MessageStockDirectory>(msg, MessageType.StockDirectory)) {
@@ -38,6 +38,7 @@ const manager =
       )
     ) {
       order = {
+        timestamp: msg.timestamp,
         stock: msg.stock,
         locate: msg.locate,
         price: msg.price,
@@ -75,6 +76,8 @@ const manager =
       }
 
       const newOrder: Order = {
+        // TODO: or original order's timestamp?
+        timestamp: msg.timestamp,
         stock: order.stock,
         locate: msg.locate,
         price: msg.price,

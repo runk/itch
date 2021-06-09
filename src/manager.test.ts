@@ -5,6 +5,16 @@ import createManager, { OrderManager } from './manager';
 import Pool from './pool';
 import OrderBook from './order-book';
 import parse from './parser';
+import {
+  Message,
+  MessageAddOrder,
+  MessageOrderCancel,
+  MessageOrderExecuted,
+  MessageOrderReplace,
+  MessageType,
+} from './parser/types';
+import { MessageOrderDelete } from './parser/msg';
+import { Order } from './order';
 
 let reader: IterableIterator<Buffer>;
 let fd: number;
@@ -97,4 +107,179 @@ test('builds pool and book', () => {
   `);
 
   expect(pool.store.size).toBe(80);
+});
+
+describe('message types', () => {
+  let pool: Pool;
+  let book: OrderBook;
+  let manager: OrderManager;
+
+  beforeEach(() => {
+    pool = new Pool();
+    book = new OrderBook();
+    manager = createManager(pool, book);
+  });
+
+  const base: Message = {
+    type: MessageType.System,
+    locate: 1,
+    tracking: 1,
+    timestamp: 1,
+  };
+  const orderAdd: MessageAddOrder = {
+    ...base,
+    type: MessageType.AddOrder,
+    timestamp: 1,
+    reference: 'abc',
+    side: 'S',
+    shares: 10,
+    stock: 'XYZ',
+    price: 10000,
+  };
+  const orderDelete: MessageOrderDelete = {
+    ...base,
+    type: MessageType.OrderDelete,
+    timestamp: 2,
+    reference: 'abc',
+  };
+
+  const orderCancel: MessageOrderCancel = {
+    ...base,
+    type: MessageType.OrderCancel,
+    timestamp: 3,
+    shares: 1,
+    reference: 'abc',
+  };
+
+  const orderReplace: MessageOrderReplace = {
+    ...base,
+    type: MessageType.OrderReplace,
+    timestamp: 4,
+    reference: 'abc',
+    referenceNew: 'def',
+    shares: 50,
+    price: 20000,
+  };
+
+  const orderExecuted: MessageOrderExecuted = {
+    ...base,
+    type: MessageType.OrderExecuted,
+    timestamp: 5,
+    reference: 'abc',
+    shares: 2,
+    match: 'match id',
+  };
+
+  it('supports AddOrder', () => {
+    const order = manager(orderAdd);
+    const expected: Order = {
+      timestamp: 1,
+      stock: 'XYZ',
+      locate: 1,
+      price: 10000,
+      shares: 10,
+      reference: 'abc',
+      side: 'S',
+    };
+    expect(order).toEqual(expected);
+    expect(pool.get(orderAdd.reference)).toEqual(expected);
+  });
+
+  it('supports OrderDelete', () => {
+    manager(orderAdd);
+    const order = manager(orderDelete);
+    expect(order).toEqual({
+      timestamp: 1,
+      stock: 'XYZ',
+      locate: 1,
+      price: 10000,
+      shares: 10,
+      reference: 'abc',
+      side: 'S',
+    });
+    expect(pool.get(orderAdd.reference)).toEqual(undefined);
+  });
+
+  it('supports OrderCancel (partial)', () => {
+    manager(orderAdd);
+    const order = manager(orderCancel);
+    const expected = {
+      timestamp: 1,
+      stock: 'XYZ',
+      locate: 1,
+      price: 10000,
+      shares: 9,
+      reference: 'abc',
+      side: 'S',
+    };
+    expect(order).toEqual(expected);
+    expect(pool.get(orderAdd.reference)).toEqual(expected);
+  });
+
+  it('supports OrderCancel (full)', () => {
+    manager(orderAdd);
+    const cancellation: MessageOrderCancel = { ...orderCancel, shares: 10 };
+    const order = manager(cancellation);
+    const expected = {
+      timestamp: 1,
+      stock: 'XYZ',
+      locate: 1,
+      price: 10000,
+      shares: 0,
+      reference: 'abc',
+      side: 'S',
+    };
+    expect(order).toEqual(expected);
+    expect(pool.get(orderAdd.reference)).toEqual(undefined);
+  });
+
+  it('supports OrderReplace', () => {
+    manager(orderAdd);
+    const order = manager(orderReplace);
+    const expected = {
+      timestamp: 4,
+      stock: 'XYZ',
+      locate: 1,
+      price: 20000,
+      shares: 50,
+      reference: 'def',
+      side: 'S',
+    };
+    expect(order).toEqual(expected);
+    expect(pool.get(orderReplace.reference)).toEqual(undefined);
+    expect(pool.get(orderReplace.referenceNew)).toEqual(expected);
+  });
+
+  it('supports OrderExecuted (partial)', () => {
+    manager(orderAdd);
+    const order = manager(orderExecuted);
+    const expected = {
+      timestamp: 1,
+      stock: 'XYZ',
+      locate: 1,
+      price: 10000,
+      shares: 8,
+      reference: 'abc',
+      side: 'S',
+    };
+    expect(order).toEqual(expected);
+    expect(pool.get(orderReplace.reference)).toEqual(expected);
+  });
+
+  it('supports OrderExecuted (full)', () => {
+    manager(orderAdd);
+    const execution = { ...orderExecuted, shares: 10 };
+    const order = manager(execution);
+    const expected = {
+      timestamp: 1,
+      stock: 'XYZ',
+      locate: 1,
+      price: 10000,
+      shares: 0,
+      reference: 'abc',
+      side: 'S',
+    };
+    expect(order).toEqual(expected);
+    expect(pool.get(orderReplace.reference)).toEqual(undefined);
+  });
 });
