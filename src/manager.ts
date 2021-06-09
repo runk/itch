@@ -20,8 +20,7 @@ export interface OrderManager {
   (msg: Message): Order | null;
 }
 
-const manager =
-  (pool: Pool, book: OrderBook): OrderManager =>
+const manager = (pool: Pool, book: OrderBook): OrderManager =>
   (msg: Message): Order | null => {
     let order: Order | undefined;
 
@@ -114,6 +113,7 @@ const manager =
       book.remove(order.side, order.price, msg.shares);
       return order;
     }
+
     return null;
   };
 
