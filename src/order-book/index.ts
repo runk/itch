@@ -8,12 +8,11 @@ const toArray = (map: Map<Price, Shares>): Price[] => {
   return Array<Price>(...map.keys()).sort((a, b) => (a > b ? 1 : -1));
 };
 
-
 const min = (arr: Map<Price, Shares>) => Math.min(...arr.keys());
 const max = (arr: Map<Price, Shares>) => Math.max(...arr.keys());
 
 const SIDE_BUY = 'B';
-const SIDE_SELL = 'S'
+const SIDE_SELL = 'S';
 
 export default class OrderBook {
   depth?: number;
@@ -42,8 +41,8 @@ export default class OrderBook {
    * @param volume
    */
   add(side: Side, price: Price, volume: Shares) {
-    if (side == SIDE_BUY) this.bid = Math.max(this.bid, price)
-    if (side == SIDE_SELL) this.ask = Math.min(this.ask, price)
+    if (side == SIDE_BUY) this.bid = Math.max(this.bid, price);
+    if (side == SIDE_SELL) this.ask = Math.min(this.ask, price);
 
     const container = side === SIDE_SELL ? this.sell : this.buy;
     const current = container.get(price) || 0;
