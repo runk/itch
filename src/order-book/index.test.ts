@@ -1,4 +1,5 @@
 import OrderBook from '.';
+import test from 'ava';
 
 const makeBook = (limit?: number) => {
   const book = new OrderBook(limit);
@@ -11,46 +12,43 @@ const makeBook = (limit?: number) => {
   return book;
 };
 
-describe('constructor()', () => {
-  it('basic', () => {
-    const book = makeBook();
+test('basic', (t) => {
+  const book = makeBook();
 
-    expect(book.buy).toMatchInlineSnapshot(`
-      Map {
-        9900 => 5000,
-        9100 => 4000,
-        9000 => 1000,
-      }
-    `);
-    expect(book.sell).toMatchInlineSnapshot(`
-      Map {
-        10000 => 1500,
-        10500 => 2000,
-      }
-    `);
-  });
+  t.deepEqual(
+    book.buy,
+    new Map([
+      [9900, 5000],
+      [9100, 4000],
+      [9000, 1000],
+    ])
+  );
+  t.deepEqual(
+    book.sell,
+    new Map([
+      [10000, 1500],
+      [10500, 2000],
+    ])
+  );
 });
 
-describe('getSpread()', () => {
-  it('works', () => {
-    const book = makeBook(1);
-    const [bid, ask] = book.getSpread();
-    expect(bid).toBe(9900);
-    expect(ask).toBe(10000);
-  });
+test('getSpread()', (t) => {
+  const book = makeBook(1);
+  const [bid, ask] = book.getSpread();
+  t.is(bid, 9900);
+  t.is(ask, 10000);
 });
 
-describe('toString()', () => {
-  it('basic', () => {
-    const book = makeBook();
-    expect(book.toString()).toMatchInlineSnapshot(`
-      "B 0.90: 1000
-      B 0.91: 4000
-      B 0.99: 5000
-      -----
-      S 1.00: 1500
-      S 1.05: 2000
-      "
-    `);
-  });
+test('toString()', (t) => {
+  const book = makeBook();
+  t.is(
+    book.toString(),
+    `B 0.90: 1000
+B 0.91: 4000
+B 0.99: 5000
+-----
+S 1.00: 1500
+S 1.05: 2000
+`
+  );
 });

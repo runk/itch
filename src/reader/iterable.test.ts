@@ -1,16 +1,17 @@
 import fs from 'fs';
 import path from 'path';
 import createIterator from './iterable';
+import test from 'ava';
 
 let reader: IterableIterator<Buffer>;
 let fd: number;
 
-beforeEach(() => {
+test.beforeEach(() => {
   const feed = path.resolve(__dirname, '../../test/locate-13-10k.bin');
   fd = fs.openSync(feed, 'r');
   reader = createIterator(fd);
 });
-afterEach((done) => fs.close(fd, done));
+test.afterEach(() => fs.closeSync(fd));
 
 const expected = [
   '52000d00000a37d4d0d3094141504c20202020514e000000644e435a20504e4e314e000000004e',
@@ -66,34 +67,34 @@ const expected = [
   '4c000d00000a3adfb27206444144414141504c20202020594e41',
 ];
 
-test('supports `for .. of` syntax', () => {
+test.serial('supports `for .. of` syntax', (t) => {
   let i = 0;
   const msgs = [];
   for (let msg of reader) {
     const type = String.fromCharCode(msg[0]);
-    expect(['H', 'R', 'Y', 'L']).toContain(type);
+    t.true(['H', 'R', 'Y', 'L'].includes(type));
     msgs.push(msg.toString('hex'));
 
     if (i++ >= 50) {
       break;
     }
   }
-  expect(msgs).toEqual(expected);
+  t.deepEqual(msgs, expected);
 });
 
-test('supports `next()` iteration style', () => {
+test.serial('supports `next()` iteration style', (t) => {
   const msgs = [];
   for (let i = 0; i <= 50; i++) {
     const msg = reader.next();
     const type = String.fromCharCode(msg.value[0]);
-    expect(['H', 'R', 'Y', 'L']).toContain(type);
-    expect(msg.done).toBe(false);
+    t.true(['H', 'R', 'Y', 'L'].includes(type), `${type} failed`);
+    t.false(msg.done);
     msgs.push(msg.value.toString('hex'));
   }
-  expect(msgs).toEqual(expected);
+  t.deepEqual(msgs, expected);
 });
 
-test('can detect the end of stream', () => {
+test.serial('can detect the end of stream', (t) => {
   let done = false;
   let n = 0;
   while (!done) {
@@ -101,5 +102,5 @@ test('can detect the end of stream', () => {
     n++;
   }
 
-  expect(n).toBe(10000);
+  t.is(n, 10000);
 });

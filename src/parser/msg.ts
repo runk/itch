@@ -43,13 +43,14 @@ export const parseAddOrderMessage: Parser<MessageAddOrder> = (buf: Buffer) => {
   };
 };
 
-export const parseAddOrderWithAttribution: Parser<MessageAddOrderWithAttribution> =
-  (buf: Buffer) => {
-    return {
-      ...parseAddOrderMessage(buf),
-      type: MessageType.AddOrderWithAttribution,
-    };
+export const parseAddOrderWithAttribution: Parser<
+  MessageAddOrderWithAttribution
+> = (buf: Buffer) => {
+  return {
+    ...parseAddOrderMessage(buf),
+    type: MessageType.AddOrderWithAttribution,
   };
+};
 
 export const parseSystem: Parser<MessageSystem> = (buf: Buffer) => {
   return {
@@ -81,18 +82,19 @@ export const parseOrderExecuted: Parser<MessageOrderExecuted> = (
   };
 };
 
-export const parseOrderExecutedWithPrice: Parser<MessageOrderExecutedWithPrice> =
-  (buf: Buffer) => {
-    return {
-      ...parseBaseMessage(buf),
-      type: MessageType.OrderExecutedWithPrice,
-      reference: buf.toString('hex', 11, 19),
-      shares: buf.readUInt32BE(19),
-      match: buf.toString('hex', 23, 31),
-      printable: buf[31],
-      price: buf.readUInt32BE(32),
-    };
+export const parseOrderExecutedWithPrice: Parser<
+  MessageOrderExecutedWithPrice
+> = (buf: Buffer) => {
+  return {
+    ...parseBaseMessage(buf),
+    type: MessageType.OrderExecutedWithPrice,
+    reference: buf.toString('hex', 11, 19),
+    shares: buf.readUInt32BE(19),
+    match: buf.toString('hex', 23, 31),
+    printable: buf[31],
+    price: buf.readUInt32BE(32),
   };
+};
 
 export const parseOrderCancel: Parser<MessageOrderCancel> = (buf: Buffer) => {
   return {
