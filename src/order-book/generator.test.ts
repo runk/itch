@@ -44,8 +44,9 @@ const readFeed = (): Pool => {
 test.serial('makes order book from pool', (t) => {
   const pool = readFeed();
   const { bids, asks } = gen(pool, Infinity);
-  t.is(stringify(bids, 'B'), 
-  `B 320.14: 25 (1)
+  t.is(
+    stringify(bids, 'B'),
+    `B 320.14: 25 (1)
 B 320.11: 101 (2)
 B 320.00: 417 (10)
 B 319.99: 30 (1)
@@ -123,10 +124,12 @@ B 210.00: 1 (1)
 B 205.22: 50 (1)
 B 200.99: 10 (1)
 B 150.00: 1 (1)
-B 0.01: 100 (1)`);
+B 0.01: 100 (1)`
+  );
 
-  t.is(stringify(asks, 'S'), 
-  `S 320.30: 100 (1)
+  t.is(
+    stringify(asks, 'S'),
+    `S 320.30: 100 (1)
 S 320.40: 100 (1)
 S 320.50: 100 (1)
 S 320.75: 100 (1)
@@ -188,23 +191,28 @@ S 363.88: 5 (1)
 S 394.56: 3 (1)
 S 450.00: 1 (1)
 S 628.50: 15 (1)
-S 199999.99: 100 (1)`);
+S 199999.99: 100 (1)`
+  );
   t.is(pool.store.size, 215);
 });
 
 test.serial('makes order book from pool with depth = 5', (t) => {
   const pool = readFeed();
   const { bids, asks } = gen(pool, 5);
-  t.is(stringify(bids, 'B'), 
-  `B 320.14: 25 (1)
+  t.is(
+    stringify(bids, 'B'),
+    `B 320.14: 25 (1)
 B 320.11: 101 (2)
 B 320.00: 417 (10)
 B 319.99: 30 (1)
-B 319.88: 100 (1)`);
-  t.is(stringify(asks, 'S'), 
-  `S 320.30: 100 (1)
+B 319.88: 100 (1)`
+  );
+  t.is(
+    stringify(asks, 'S'),
+    `S 320.30: 100 (1)
 S 320.40: 100 (1)
 S 320.50: 100 (1)
 S 320.75: 100 (1)
-S 320.90: 59 (1)`);
+S 320.90: 59 (1)`
+  );
 });

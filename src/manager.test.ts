@@ -38,8 +38,9 @@ test.serial('builds pool and book', (t) => {
     manager(msg);
   }
 
-  t.is(book.toString(),
-  `B 216.00: 5
+  t.is(
+    book.toString(),
+    `B 216.00: 5
 B 260.00: 100
 B 270.00: 100
 B 278.00: 1
@@ -104,7 +105,8 @@ S 360.00: 76
 S 363.88: 5
 S 394.56: 3
 S 400.00: 80
-`);
+`
+  );
 
   t.is(pool.store.size, 80);
 });
