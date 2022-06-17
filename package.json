@@ -28,7 +28,6 @@
     "extensions": [
       "ts"
     ],
-    "snapshotDir": "snapshots",
     "files": [
       "**/*.test.ts"
     ],
