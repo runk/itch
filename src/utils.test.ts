@@ -1,21 +1,23 @@
 import { timestampToTime } from './utils';
-it('works', () => {
-  expect(timestampToTime(1000)).toBe('00:00:00.000000001');
-  expect(timestampToTime(34244958684803)).toBe('09:30:44.958684803');
-  expect(timestampToTime(34244958686571)).toBe('09:30:44.958686571');
-  expect(timestampToTime(34265057750724)).toBe('09:31:05.057750724');
-  expect(timestampToTime(34265057751385)).toBe('09:31:05.057751385');
-  expect(timestampToTime(84265057751385)).toBe('23:24:25.057751385');
+import test from 'ava';
+
+test('works', (t) => {
+  t.is(timestampToTime(1000), '00:00:00.000000001');
+  t.is(timestampToTime(34244958684803), '09:30:44.958684803');
+  t.is(timestampToTime(34244958686571), '09:30:44.958686571');
+  t.is(timestampToTime(34265057750724), '09:31:05.057750724');
+  t.is(timestampToTime(34265057751385), '09:31:05.057751385');
+  t.is(timestampToTime(84265057751385), '23:24:25.057751385');
 });
 
-it('works with precision', () => {
+test('works with precision', (t) => {
   const precision = 3;
-  expect(timestampToTime(1000, precision)).toBe('00:00:00.000');
-  expect(timestampToTime(34244958684803, precision)).toBe('09:30:44.959');
-  expect(timestampToTime(34244958686571, precision)).toBe('09:30:44.959');
-  expect(timestampToTime(34265057750724, precision)).toBe('09:31:05.058');
-  expect(timestampToTime(34265057751385, precision)).toBe('09:31:05.058');
-  expect(timestampToTime(84265057751385, precision)).toBe('23:24:25.058');
+  t.is(timestampToTime(1000, precision), '00:00:00.000');
+  t.is(timestampToTime(34244958684803, precision), '09:30:44.959');
+  t.is(timestampToTime(34244958686571, precision), '09:30:44.959');
+  t.is(timestampToTime(34265057750724, precision), '09:31:05.058');
+  t.is(timestampToTime(34265057751385, precision), '09:31:05.058');
+  t.is(timestampToTime(84265057751385, precision), '23:24:25.058');
 
-  expect(timestampToTime(34200000000000, precision)).toBe('09:30:00.000');
+  t.is(timestampToTime(34200000000000, precision), '09:30:00.000');
 });
