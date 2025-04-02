@@ -61,7 +61,7 @@ export default class OrderBook {
     const current = container.get(price) || 0;
     assert(
       current >= volume,
-      `Cannot remove more ${volume} volume than ${current} total at this level ${price}`
+      `Cannot remove more ${volume} volume than ${current} total at this level ${price}`,
     );
 
     if (volume === current) {
