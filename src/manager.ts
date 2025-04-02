@@ -34,7 +34,7 @@ const manager =
       isType<MessageAddOrder>(msg, MessageType.AddOrder) ||
       isType<MessageAddOrderWithAttribution>(
         msg,
-        MessageType.AddOrderWithAttribution
+        MessageType.AddOrderWithAttribution,
       )
     ) {
       order = {
@@ -97,7 +97,7 @@ const manager =
     if (
       isType<MessageOrderExecutedWithPrice>(
         msg,
-        MessageType.OrderExecutedWithPrice
+        MessageType.OrderExecutedWithPrice,
       )
     ) {
       order = pool.get(msg.reference);

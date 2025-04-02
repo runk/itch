@@ -7,9 +7,16 @@ export default (source: string, onMessage: OnMessageFn) => {
   const stream = fs.createReadStream(source);
   let leftover: Buffer | undefined;
   let seq = 0;
-  stream.on('data', (chunk: Buffer) => {
+  stream.on('data', (chunk: string | Buffer) => {
     const buf =
-      leftover !== undefined ? Buffer.concat([leftover, chunk]) : chunk;
+      leftover !== undefined
+        ? Buffer.concat([
+            leftover,
+            Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk),
+          ])
+        : Buffer.isBuffer(chunk)
+          ? chunk
+          : Buffer.from(chunk);
 
     leftover = undefined;
 

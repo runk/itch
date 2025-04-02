@@ -61,7 +61,7 @@ export const parseSystem: Parser<MessageSystem> = (buf: Buffer) => {
 };
 
 export const parseStockDirectory: Parser<MessageStockDirectory> = (
-  buf: Buffer
+  buf: Buffer,
 ) => {
   return {
     ...parseBaseMessage(buf),
@@ -71,7 +71,7 @@ export const parseStockDirectory: Parser<MessageStockDirectory> = (
 };
 
 export const parseOrderExecuted: Parser<MessageOrderExecuted> = (
-  buf: Buffer
+  buf: Buffer,
 ) => {
   return {
     ...parseBaseMessage(buf),

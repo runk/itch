@@ -91,7 +91,7 @@ export interface MessageOrderCancel extends Message {
 // TODO: is there a better way of doing it?
 export const isType = <T extends Message>(
   msg: Message,
-  type: MessageType
+  type: MessageType,
 ): msg is T => {
   return msg.type === type;
 };

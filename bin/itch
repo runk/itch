@@ -13,7 +13,7 @@ program
   .requiredOption('-f, --file <string>', 'Input file with ITCH data feed')
   .option(
     '-t, --type <string>',
-    'Filter by a specific message type, e.g. "R" or "A"'
+    'Filter by a specific message type, e.g. "R" or "A"',
   )
   .option('-b, --binary', 'Raw data (binary) output')
   .option('-l, --locate <number>', 'Filter by a specific locate', parseInt)
