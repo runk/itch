@@ -34,5 +34,6 @@
     "require": [
       "ts-node/register"
     ]
-  }
+  },
+  "repository": "https://github.com/runk/itch"
 }
