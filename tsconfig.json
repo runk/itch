@@ -15,7 +15,8 @@
     "sourceMap": true,
     "strict": true,
     "lib": ["ES2019"],
-    "target": "ES2019"
+    "target": "ES2019",
+    "types": ["node"]
   },
   "exclude": [
     "node_modules",
