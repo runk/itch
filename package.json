@@ -15,7 +15,7 @@
   "license": "MIT",
   "main": "lib/index.js",
   "devDependencies": {
-    "@types/node": "24.12.0",
+    "@types/node": "24.12.2",
     "ava": "7.0.0",
     "prettier": "3.8.1",
     "ts-node": "10.9.2",
