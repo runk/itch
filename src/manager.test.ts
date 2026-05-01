@@ -15,19 +15,19 @@ import {
 } from './parser/types';
 import { MessageOrderDelete } from './parser/msg';
 import { Order } from './order';
-import test from 'ava';
+import { afterEach, beforeEach, expect, test } from 'vitest';
 
 let reader: IterableIterator<Buffer>;
 let fd: number;
 
 const feed = path.resolve(__dirname, '../test/locate-13-10k.bin');
-test.beforeEach(() => {
+beforeEach(() => {
   fd = fs.openSync(feed, 'r');
   reader = createIterator(fd);
 });
-test.afterEach(() => fs.closeSync(fd));
+afterEach(() => fs.closeSync(fd));
 
-test.serial('builds pool and book', (t) => {
+test('builds pool and book', () => {
   const pool = new Pool();
   const book = new OrderBook();
   const manager = createManager(pool, book);
@@ -38,8 +38,7 @@ test.serial('builds pool and book', (t) => {
     manager(msg);
   }
 
-  t.is(
-    book.toString(),
+  expect(book.toString()).toBe(
     `B 216.00: 5
 B 260.00: 100
 B 270.00: 100
@@ -108,14 +107,14 @@ S 400.00: 80
 `,
   );
 
-  t.is(pool.store.size, 80);
+  expect(pool.store.size).toBe(80);
 });
 
 let pool: Pool;
 let book: OrderBook;
 let manager: OrderManager;
 
-test.beforeEach(() => {
+beforeEach(() => {
   pool = new Pool();
   book = new OrderBook();
   manager = createManager(pool, book);
@@ -171,7 +170,7 @@ const orderExecuted: MessageOrderExecuted = {
   match: 'match id',
 };
 
-test.serial('supports AddOrder', (t) => {
+test('supports AddOrder', () => {
   const order = manager(orderAdd);
   const expected: Order = {
     timestamp: 1,
@@ -182,14 +181,14 @@ test.serial('supports AddOrder', (t) => {
     reference: 'abc',
     side: 'S',
   };
-  t.deepEqual(order, expected);
-  t.deepEqual(pool.get(orderAdd.reference), expected);
+  expect(order).toEqual(expected);
+  expect(pool.get(orderAdd.reference)).toEqual(expected);
 });
 
-test.serial('supports OrderDelete', (t) => {
+test('supports OrderDelete', () => {
   manager(orderAdd);
   const order = manager(orderDelete);
-  t.deepEqual(order, {
+  expect(order).toEqual({
     timestamp: 1,
     stock: 'XYZ',
     locate: 1,
@@ -198,10 +197,10 @@ test.serial('supports OrderDelete', (t) => {
     reference: 'abc',
     side: 'S',
   });
-  t.deepEqual(pool.get(orderAdd.reference), undefined);
+  expect(pool.get(orderAdd.reference)).toBe(undefined);
 });
 
-test.serial('supports OrderCancel (partial)', (t) => {
+test('supports OrderCancel (partial)', () => {
   manager(orderAdd);
   const order = manager(orderCancel);
   const expected = {
@@ -213,11 +212,11 @@ test.serial('supports OrderCancel (partial)', (t) => {
     reference: 'abc',
     side: 'S',
   };
-  t.deepEqual(order, expected);
-  t.deepEqual(pool.get(orderAdd.reference), expected);
+  expect(order).toEqual(expected);
+  expect(pool.get(orderAdd.reference)).toEqual(expected);
 });
 
-test.serial('supports OrderCancel (full)', (t) => {
+test('supports OrderCancel (full)', () => {
   manager(orderAdd);
   const cancellation: MessageOrderCancel = { ...orderCancel, shares: 10 };
   const order = manager(cancellation);
@@ -230,11 +229,11 @@ test.serial('supports OrderCancel (full)', (t) => {
     reference: 'abc',
     side: 'S',
   };
-  t.deepEqual(order, expected);
-  t.deepEqual(pool.get(orderAdd.reference), undefined);
+  expect(order).toEqual(expected);
+  expect(pool.get(orderAdd.reference)).toBe(undefined);
 });
 
-test.serial('supports OrderReplace', (t) => {
+test('supports OrderReplace', () => {
   manager(orderAdd);
   const order = manager(orderReplace);
   const expected = {
@@ -246,12 +245,12 @@ test.serial('supports OrderReplace', (t) => {
     reference: 'def',
     side: 'S',
   };
-  t.deepEqual(order, expected);
-  t.deepEqual(pool.get(orderReplace.reference), undefined);
-  t.deepEqual(pool.get(orderReplace.referenceNew), expected);
+  expect(order).toEqual(expected);
+  expect(pool.get(orderReplace.reference)).toBe(undefined);
+  expect(pool.get(orderReplace.referenceNew)).toEqual(expected);
 });
 
-test.serial('supports OrderExecuted (partial)', (t) => {
+test('supports OrderExecuted (partial)', () => {
   manager(orderAdd);
   const order = manager(orderExecuted);
   const expected = {
@@ -263,11 +262,11 @@ test.serial('supports OrderExecuted (partial)', (t) => {
     reference: 'abc',
     side: 'S',
   };
-  t.deepEqual(order, expected);
-  t.deepEqual(pool.get(orderReplace.reference), expected);
+  expect(order).toEqual(expected);
+  expect(pool.get(orderReplace.reference)).toEqual(expected);
 });
 
-test.serial('supports OrderExecuted (full)', (t) => {
+test('supports OrderExecuted (full)', () => {
   manager(orderAdd);
   const execution = { ...orderExecuted, shares: 10 };
   const order = manager(execution);
@@ -280,6 +279,6 @@ test.serial('supports OrderExecuted (full)', (t) => {
     reference: 'abc',
     side: 'S',
   };
-  t.deepEqual(order, expected);
-  t.deepEqual(pool.get(orderReplace.reference), undefined);
+  expect(order).toEqual(expected);
+  expect(pool.get(orderReplace.reference)).toBe(undefined);
 });

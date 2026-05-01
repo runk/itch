@@ -1,17 +1,17 @@
 import fs from 'fs';
 import path from 'path';
 import createIterator from './iterable';
-import test from 'ava';
+import { afterEach, beforeEach, expect, test } from 'vitest';
 
 let reader: IterableIterator<Buffer>;
 let fd: number;
 
-test.beforeEach(() => {
+beforeEach(() => {
   const feed = path.resolve(__dirname, '../../test/locate-13-10k.bin');
   fd = fs.openSync(feed, 'r');
   reader = createIterator(fd);
 });
-test.afterEach(() => fs.closeSync(fd));
+afterEach(() => fs.closeSync(fd));
 
 const expected = [
   '52000d00000a37d4d0d3094141504c20202020514e000000644e435a20504e4e314e000000004e',
@@ -67,34 +67,34 @@ const expected = [
   '4c000d00000a3adfb27206444144414141504c20202020594e41',
 ];
 
-test.serial('supports `for .. of` syntax', (t) => {
+test('supports `for .. of` syntax', () => {
   let i = 0;
   const msgs = [];
   for (let msg of reader) {
     const type = String.fromCharCode(msg[0]);
-    t.true(['H', 'R', 'Y', 'L'].includes(type));
+    expect(['H', 'R', 'Y', 'L'].includes(type)).toBe(true);
     msgs.push(msg.toString('hex'));
 
     if (i++ >= 50) {
       break;
     }
   }
-  t.deepEqual(msgs, expected);
+  expect(msgs).toEqual(expected);
 });
 
-test.serial('supports `next()` iteration style', (t) => {
+test('supports `next()` iteration style', () => {
   const msgs = [];
   for (let i = 0; i <= 50; i++) {
     const msg = reader.next();
     const type = String.fromCharCode(msg.value[0]);
-    t.true(['H', 'R', 'Y', 'L'].includes(type), `${type} failed`);
-    t.false(msg.done);
+    expect(['H', 'R', 'Y', 'L'].includes(type), `${type} failed`).toBe(true);
+    expect(msg.done).toBe(false);
     msgs.push(msg.value.toString('hex'));
   }
-  t.deepEqual(msgs, expected);
+  expect(msgs).toEqual(expected);
 });
 
-test.serial('can detect the end of stream', (t) => {
+test('can detect the end of stream', () => {
   let done = false;
   let n = 0;
   while (!done) {
@@ -102,5 +102,5 @@ test.serial('can detect the end of stream', (t) => {
     n++;
   }
 
-  t.is(n, 10000);
+  expect(n).toBe(10000);
 });
