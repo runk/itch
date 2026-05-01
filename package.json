@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "ava",
+    "test": "vitest run",
     "format": "prettier --write .",
     "start": "ts-node src/local.ts"
   },
@@ -16,24 +16,13 @@
   "main": "lib/index.js",
   "devDependencies": {
     "@types/node": "24.12.2",
-    "ava": "7.0.0",
     "prettier": "3.8.3",
     "ts-node": "10.9.2",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "3.2.4"
   },
   "dependencies": {
     "commander": "14.0.3"
-  },
-  "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "files": [
-      "**/*.test.ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ]
   },
   "repository": "https://github.com/runk/itch"
 }

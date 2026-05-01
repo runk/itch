@@ -1,5 +1,5 @@
 import OrderBook from '.';
-import test from 'ava';
+import { expect, test } from 'vitest';
 
 const makeBook = (limit?: number) => {
   const book = new OrderBook(limit);
@@ -12,19 +12,17 @@ const makeBook = (limit?: number) => {
   return book;
 };
 
-test('basic', (t) => {
+test('basic', () => {
   const book = makeBook();
 
-  t.deepEqual(
-    book.buy,
+  expect(book.buy).toEqual(
     new Map([
       [9900, 5000],
       [9100, 4000],
       [9000, 1000],
     ]),
   );
-  t.deepEqual(
-    book.sell,
+  expect(book.sell).toEqual(
     new Map([
       [10000, 1500],
       [10500, 2000],
@@ -32,17 +30,16 @@ test('basic', (t) => {
   );
 });
 
-test('getSpread()', (t) => {
+test('getSpread()', () => {
   const book = makeBook(1);
   const [bid, ask] = book.getSpread();
-  t.is(bid, 9900);
-  t.is(ask, 10000);
+  expect(bid).toBe(9900);
+  expect(ask).toBe(10000);
 });
 
-test('toString()', (t) => {
+test('toString()', () => {
   const book = makeBook();
-  t.is(
-    book.toString(),
+  expect(book.toString()).toBe(
     `B 0.90: 1000
 B 0.91: 4000
 B 0.99: 5000

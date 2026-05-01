@@ -6,17 +6,17 @@ import Pool from '../pool';
 import OrderBook from '.';
 import gen, { Level } from './generator';
 import parse from '../parser';
-import test from 'ava';
+import { afterEach, beforeEach, expect, test } from 'vitest';
 
 let reader: IterableIterator<Buffer>;
 let fd: number;
 
 const feed = path.resolve(__dirname, '../../test/locate-13-10k.bin');
-test.beforeEach(() => {
+beforeEach(() => {
   fd = fs.openSync(feed, 'r');
   reader = createIterator(fd);
 });
-test.afterEach(() => fs.closeSync(fd));
+afterEach(() => fs.closeSync(fd));
 
 const stringify = (levels: Level[], side: 'S' | 'B'): string => {
   const out = [];
@@ -41,11 +41,10 @@ const readFeed = (): Pool => {
   return pool;
 };
 
-test.serial('makes order book from pool', (t) => {
+test('makes order book from pool', () => {
   const pool = readFeed();
   const { bids, asks } = gen(pool, Infinity);
-  t.is(
-    stringify(bids, 'B'),
+  expect(stringify(bids, 'B')).toBe(
     `B 320.14: 25 (1)
 B 320.11: 101 (2)
 B 320.00: 417 (10)
@@ -127,8 +126,7 @@ B 150.00: 1 (1)
 B 0.01: 100 (1)`,
   );
 
-  t.is(
-    stringify(asks, 'S'),
+  expect(stringify(asks, 'S')).toBe(
     `S 320.30: 100 (1)
 S 320.40: 100 (1)
 S 320.50: 100 (1)
@@ -193,22 +191,20 @@ S 450.00: 1 (1)
 S 628.50: 15 (1)
 S 199999.99: 100 (1)`,
   );
-  t.is(pool.store.size, 215);
+  expect(pool.store.size).toBe(215);
 });
 
-test.serial('makes order book from pool with depth = 5', (t) => {
+test('makes order book from pool with depth = 5', () => {
   const pool = readFeed();
   const { bids, asks } = gen(pool, 5);
-  t.is(
-    stringify(bids, 'B'),
+  expect(stringify(bids, 'B')).toBe(
     `B 320.14: 25 (1)
 B 320.11: 101 (2)
 B 320.00: 417 (10)
 B 319.99: 30 (1)
 B 319.88: 100 (1)`,
   );
-  t.is(
-    stringify(asks, 'S'),
+  expect(stringify(asks, 'S')).toBe(
     `S 320.30: 100 (1)
 S 320.40: 100 (1)
 S 320.50: 100 (1)
