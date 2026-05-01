@@ -16,7 +16,7 @@
   "main": "lib/index.js",
   "devDependencies": {
     "@types/node": "24.12.2",
-    "ava": "7.0.0",
+    "ava": "8.0.0",
     "prettier": "3.8.3",
     "ts-node": "10.9.2",
     "typescript": "6.0.3"
